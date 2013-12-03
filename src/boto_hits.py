@@ -29,34 +29,46 @@ overview.append_field('Text', 'For each tweet, please specify the following:\n'
 
 
 #--------------- BUILD QUESTIONS ----------------------- 
- #What are all the fields?
-qc1 = QuestionContent()
-qc1.append_field('Text','@funnyorfact: If Jim has 50 chocolate bars, and eats 45, what does he have? Diabetes. Jim has diabetes..')
- 
-fta1 = SelectionAnswer(min=1, max=1,style='radiobutton',
-                      selections=ratings,
-                      type='text',
-                      other=False)
- 
-q1 = Question(identifier='identifier',
-              content=qc1,
-              answer_spec=AnswerSpecification(fta1),
-              is_required=True)
-#q1.template = '<Question><Length minLength="2" maxLength="2" /></Question>'
- 
- 
-#--------------- BUILD THE QUESTION FORM -------------------
- 
+
+
+f = open('diabetes_parsed.txt', 'r')
+file_content = f.readlines()
+
 question_form = QuestionForm()
 question_form.append(overview)
-question_form.append(q1)
+
+i = 0
+for tweet in file_content:
+ #What are all the fields?
+  if i == 20:
+    i = 0
  
-#--------------- CREATE THE HIT -------------------
+    #--------------- CREATE THE HIT -------------------
+     
+    mtc.create_hit(questions=question_form,
+                   max_assignments=1,
+                   title=title,
+                   description=description,
+                   keywords=keywords,
+                   duration = 60*5,
+                   reward=0.02)
  
-mtc.create_hit(questions=question_form,
-               max_assignments=1,
-               title=title,
-               description=description,
-               keywords=keywords,
-               duration = 60*5,
-               reward=0.02)
+    question_form = QuestionForm()
+    question_form.append(overview)
+
+  qc = QuestionContent()
+  qc.append_field('Text', tweet)
+     
+  fta = SelectionAnswer(min=1, max=1,style='radiobutton',
+                          selections=ratings,
+                          type='text',
+                          other=False)
+     
+  q = Question(identifier='identifier',
+                  content=qc,
+                  answer_spec=AnswerSpecification(fta),
+                  is_required=True)
+  question_form.append(q)
+#q1.template = '<Question><Length minLength="2" maxLength="2" /></Question>'
+  i+=1
+ 
