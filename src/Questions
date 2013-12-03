@@ -1,0 +1,46 @@
+objectives:
+
+Post to sandbox - boto Ω
+
+	Formating the HIT? Ω
+
+		For loop to create a formatted QuestionContent
+
+			Potentially feed in CSV???
+
+	How do we get to see our posts in the requester web console?
+
+	Best way to upload CSV?
+
+		Feeding CSV into our boto locally then uploading?
+
+
+Automated Hit Acceptance
+
+	Majority Vote
+
+
+Quality Control? 
+
+	Gold Standard -- cheaper, but we have to manually label a shit ton of tweets (.05%)
+
+	Majority Vote -- more expensive because we need to duplicate the same tweet across different HITS
+
+Constraints
+	
+	Interesting analysis -- more analysis component
+
+	Getting machine learning classifier to work
+
+	Iterating over several types of conditions
+			Experimented with these features as input
+			This quality control to filter out bad data
+			Plotted learning curve
+			Estimate population of tweets
+			Price points/costs
+
+Write to Michael Paul? -- Ask for data
+
+Readings -> Resources -> Boto
+
+Final presentation -- video presentation (Final Date)
