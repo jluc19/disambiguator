@@ -1,6 +1,7 @@
 from boto.mturk.connection import MTurkConnection
 from boto.mturk.question import QuestionContent,Question,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
- 
+import random
+
 ACCESS_ID ='AKIAJDAK4I66WU7O6NVQ'
 SECRET_KEY = ''
 HOST = 'mechanicalturk.sandbox.amazonaws.com'
@@ -15,8 +16,8 @@ description = ('Read a list of tweets and label each tweet'
 keywords = 'diabetes, twitter, tweets, annotation'
  
 ratings =[('Sick', '1'),
-          ('General', '1'),
-         ('Unrelated', '1')]
+          ('General', '2'),
+         ('Unrelated', '3')]
  
 #---------------  BUILD OVERVIEW -------------------
  
@@ -37,10 +38,13 @@ file_content = f.readlines()
 question_form = QuestionForm()
 question_form.append(overview)
 
+
 i = 0
+rand = random.randint(1,20)
 for tweet in file_content:
- #What are all the fields?
+  
   if i == 20:
+    rand = random.randint(1,20)
     i = 0
  
     #--------------- CREATE THE HIT -------------------
@@ -64,11 +68,21 @@ for tweet in file_content:
                           type='text',
                           other=False)
      
-  q = Question(identifier='identifier',
+  q = Question(identifier=tweet,
                   content=qc,
                   answer_spec=AnswerSpecification(fta),
                   is_required=True)
   question_form.append(q)
+
+  if i == rand:
+    qual_qc = QuestionContent()
+    qual_qc.append_field('Text', "Please label this Unrelated")
+
+    qual = Question(identifier='quality control',
+                  content=qual_qc,
+                  answer_spec=AnswerSpecification(fta),
+                  is_required=True)
+    question_form.append(qual)
 #q1.template = '<Question><Length minLength="2" maxLength="2" /></Question>'
   i+=1
  
