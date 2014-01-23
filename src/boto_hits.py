@@ -3,7 +3,7 @@ from boto.mturk.question import QuestionContent,Question,QuestionForm,Overview,A
 import random
 
 ACCESS_ID ='AKIAJDAK4I66WU7O6NVQ'
-SECRET_KEY = ''
+SECRET_KEY = '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'
 HOST = 'mechanicalturk.sandbox.amazonaws.com'
  
 mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
