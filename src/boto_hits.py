@@ -15,18 +15,21 @@ description = ('Read a list of tweets and label each tweet'
                'based on the content of the tweet')
 keywords = 'diabetes, twitter, tweets, annotation'
  
-ratings =[('Sick', '1'),
-          ('General', '2'),
-         ('Unrelated', '3')]
+ratings =[('Self', '1'),
+          ('Other Person', '2'),
+          ('General', '3'),
+         ('Unrelated', '4')]
  
 #---------------  BUILD OVERVIEW -------------------
  
 overview = Overview()
 overview.append_field('Title', 'Disease Tweet Annotation')
 overview.append_field('Text', 'For each tweet, please specify the following:\n'
-                                      'If the tweeter has diabetes label Sick.\n'
-                                      'If it\'s a general statement about diabetes label General.\n'
-                                      'If it\'s unrelated, label Unrelated.\n')
+                                      'Only if the tweeter has diabetes, label Self.\n'
+                                      'If the tweeter is referring to another individual with diabetes, label Other Person\n'
+                                      'If it\'s a general statement about diabetes label, General.\n'
+                                      'If it\'s unrelated or not in English, label Unrelated.\n'
+                                      'For example, \'I don\'t know if I threw up because of dairy or diabetes. Help. Me.\' should be labeled as Self')
 
 
 #--------------- BUILD QUESTIONS ----------------------- 
@@ -34,6 +37,11 @@ overview.append_field('Text', 'For each tweet, please specify the following:\n'
 
 f = open('diabetes_parsed.txt', 'r')
 file_content = f.readlines()
+f.close()
+
+f_2 = open('control_tweets.txt', 'r')
+control_content = f_2.readlines()
+f_2.close()
 
 question_form = QuestionForm()
 question_form.append(overview)
@@ -41,10 +49,13 @@ question_form.append(overview)
 
 i = 0
 rand = random.randint(1,20)
+control = control_content[random.randint(0,2)]
 for tweet in file_content:
   
   if i == 20:
     rand = random.randint(1,20)
+    rand_control = random.randint(0,2)
+    control = control_content[rand_control]
     i = 0
  
     #--------------- CREATE THE HIT -------------------
@@ -76,9 +87,9 @@ for tweet in file_content:
 
   if i == rand:
     qual_qc = QuestionContent()
-    qual_qc.append_field('Text', "Please label this Unrelated")
+    qual_qc.append_field('Text', control)
 
-    qual = Question(identifier='quality control',
+    qual = Question(identifier=control,
                   content=qual_qc,
                   answer_spec=AnswerSpecification(fta),
                   is_required=True)
