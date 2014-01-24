@@ -17,43 +17,48 @@ keywords = 'diabetes, twitter, tweets, annotation'
  
 ratings =[('Self', '1'),
           ('Other Person', '2'),
-          ('General', '3'),
-         ('Unrelated', '4')]
+          ('Unrelated', '3'),
+          ('Unclear', '4')]
  
 #---------------  BUILD OVERVIEW -------------------
  
 overview = Overview()
 overview.append_field('Title', 'Disease Tweet Annotation')
 overview.append_field('Text', 'For each tweet, please specify the following:\n'
-                                      'Only if the tweeter has diabetes, label Self.\n'
-                                      'If the tweeter is referring to another individual with diabetes, label Other Person\n'
-                                      'If it\'s a general statement about diabetes label, General.\n'
-                                      'If it\'s unrelated or not in English, label Unrelated.\n'
+                                      'ONLY if the tweeter HAS diabetes, label Self.\n'
+                                      'If the tweeter is referring to ANOTHER individual who HAS diabetes, label Other Person\n'
+                                      'Otherwise, label Unrelated.\n'
+                                      'If it\'s unclear who HAS diabetes, label Unclear\n'
                                       'For example, \'I don\'t know if I threw up because of dairy or diabetes. Help. Me.\' should be labeled as Self')
 
 
 #--------------- BUILD QUESTIONS ----------------------- 
 
+parsed_tweets_to_annotate_filename = 'diabetes_parsed.txt'
+control_tweets_filename = 'control_tweets.txt'
 
-f = open('diabetes_parsed.txt', 'r')
+
+f = open(parsed_tweets_to_annotate_filename, 'r')
 file_content = f.readlines()
 f.close()
 
-f_2 = open('control_tweets.txt', 'r')
+f_2 = open(control_tweets_filename, 'r')
 control_content = f_2.readlines()
 f_2.close()
 
 question_form = QuestionForm()
 question_form.append(overview)
 
+n = 20 # number of tweets for each hit
+
 
 i = 0
-rand = random.randint(1,20)
+rand = random.randint(1,n)
 control = control_content[random.randint(0,2)]
 for tweet in file_content:
   
-  if i == 20:
-    rand = random.randint(1,20)
+  if i == n:
+    rand = random.randint(1,n)
     rand_control = random.randint(0,2)
     control = control_content[rand_control]
     i = 0
