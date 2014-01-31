@@ -4,7 +4,7 @@ import random
 
 ACCESS_ID ='AKIAJDAK4I66WU7O6NVQ'
 SECRET_KEY = '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'
-HOST = 'mechanicalturk.sandbox.amazonaws.com'
+HOST = 'mechanicalturk.amazonaws.com'
  
 mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
                       aws_secret_access_key=SECRET_KEY,
