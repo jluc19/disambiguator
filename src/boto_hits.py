@@ -52,12 +52,12 @@ n = 20 # number of tweets for each hit
 
 i = 0
 rand = random.randint(1,n)
-control = control_content[random.randint(0,2)]
+control = control_content[random.randint(0,10)]
 for tweet in file_content:
   
   if i == n:
     rand = random.randint(1,n)
-    rand_control = random.randint(0,2)
+    rand_control = random.randint(0,10)
     control = control_content[rand_control]
     i = 0
  
