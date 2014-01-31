@@ -17,8 +17,7 @@ keywords = 'diabetes, twitter, tweets, annotation'
  
 ratings =[('Self', '1'),
           ('Other Person', '2'),
-          ('Unrelated', '3'),
-          ('Unclear', '4')]
+          ('Unrelated', '3')]
  
 #---------------  BUILD OVERVIEW -------------------
  
@@ -28,7 +27,6 @@ overview.append_field('Text', 'For each tweet, please specify the following:\n'
                                       'ONLY if the tweeter HAS diabetes, label Self.\n'
                                       'If the tweeter is referring to ANOTHER individual who HAS diabetes, label Other Person\n'
                                       'Otherwise, label Unrelated.\n'
-                                      'If it\'s unclear who HAS diabetes, label Unclear\n'
                                       'For example, \'I don\'t know if I threw up because of dairy or diabetes. Help. Me.\' should be labeled as Self')
 
 
