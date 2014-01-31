@@ -17,7 +17,7 @@ keywords = 'diabetes, twitter, tweets, annotation'
  
 ratings =[('Self', '1'),
           ('Other Person', '2'),
-          ('Unrelated', '3')]
+          ('Neither', '3')]
  
 #---------------  BUILD OVERVIEW -------------------
  
@@ -26,8 +26,9 @@ overview.append_field('Title', 'Disease Tweet Annotation')
 overview.append_field('Text', 'For each tweet, please specify the following:\n'
                                       'ONLY if the tweeter HAS diabetes, label Self.\n'
                                       'If the tweeter is referring to ANOTHER individual who HAS diabetes, label Other Person\n'
-                                      'Otherwise, label Unrelated.\n'
-                                      'For example, \'I don\'t know if I threw up because of dairy or diabetes. Help. Me.\' should be labeled as Self')
+                                      'Otherwise, label Neither.\n'
+                                      'For example: \'I don\'t know if I threw up because of dairy or diabetes. Help. Me.\' should be labeled as Self\n'
+                                      'Another example: \'If Jim has 50 chocolate bars, and eats 45, what does he have? Diabetes. Jim has diabetes..\' should be labeled as Neither')
 
 
 #--------------- BUILD QUESTIONS ----------------------- 
@@ -68,7 +69,7 @@ for tweet in file_content:
                    title=title,
                    description=description,
                    keywords=keywords,
-                   duration = 60*5,
+                   duration = 60*10,
                    reward=0.02)
  
     question_form = QuestionForm()

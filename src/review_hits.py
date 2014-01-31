@@ -2,7 +2,7 @@ from boto.mturk.connection import MTurkConnection
 
 ACCESS_ID = 'AKIAJDAK4I66WU7O6NVQ'
 SECRET_KEY = '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'
-HOST = 'mechanicalturk.amazonaws.com'
+HOST = 'mechanicalturk.sandbox.amazonaws.com'
  
 def get_all_reviewable_hits(conn):
     hits = conn.get_reviewable_hits(page_size = 93)
@@ -17,18 +17,19 @@ hits = get_all_reviewable_hits(conn)
 f = open('control_tweets_with_labels.txt')
 file_content = f.readlines()
 control_labels = {}
-i = 4
+
 for line in file_content:
-    control_labels[" ".join(line.split()[0:-1])] = str(i)
-    i-=1
+    splitted = line.split()
+    label = splitted[len(splitted) - 1]
+    control_labels[" ".join(line.split()[0:-1])] = label
+    
 f = open("rejected_tweets.txt", 'w')
 f1 = open("accepted_tweets.txt", 'w')
 for hit in hits:
     assignments = conn.get_assignments(hit.HITId)
     #conn.disable_hit(hit.HITId)
-
+    approve = False
     for assignment in assignments:
-        approve = False
         #print "Answers of the worker %s" % assignment.WorkerId
         for question_form_answer in assignment.answers[0]:
             question = question_form_answer.qid.replace('\n', '')
@@ -49,14 +50,14 @@ for hit in hits:
         for assignment in assignments:
             for question_form_answer in assignment.answers[0]:
                 f.writelines(question_form_answer.qid.encode('ascii', 'ignore'))
-        conn.approve_assignment(assignment.AssignmentId)
+            conn.reject_assignment(assignment.AssignmentId)
         conn.disable_hit(hit.HITId)
     else:
         for assignment in assignments:
             for question_form_answer in assignment.answers[0]:
                 f1.write(question_form_answer.qid.encode('ascii', 'ignore'))
                 f1.write(question_form_answer.fields[0].encode('ascii', 'ignore') + '\n')
-        conn.approve_assignment(assignment.AssignmentId)
+            conn.approve_assignment(assignment.AssignmentId)
         conn.disable_hit(hit.HITId)
         
 
