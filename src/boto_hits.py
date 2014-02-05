@@ -4,7 +4,7 @@ import random
 
 ACCESS_ID ='AKIAJDAK4I66WU7O6NVQ'
 SECRET_KEY = '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'
-HOST = 'mechanicalturk.sandbox.amazonaws.com'
+HOST = 'mechanicalturk.amazonaws.com'
  
 mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
                       aws_secret_access_key=SECRET_KEY,
@@ -17,44 +17,48 @@ keywords = 'diabetes, twitter, tweets, annotation'
  
 ratings =[('Self', '1'),
           ('Other Person', '2'),
-          ('General', '3'),
-         ('Unrelated', '4')]
+          ('Neither', '3')]
  
 #---------------  BUILD OVERVIEW -------------------
  
 overview = Overview()
 overview.append_field('Title', 'Disease Tweet Annotation')
 overview.append_field('Text', 'For each tweet, please specify the following:\n'
-                                      'Only if the tweeter has diabetes, label Self.\n'
-                                      'If the tweeter is referring to another individual with diabetes, label Other Person\n'
-                                      'If it\'s a general statement about diabetes label, General.\n'
-                                      'If it\'s unrelated or not in English, label Unrelated.\n'
-                                      'For example, \'I don\'t know if I threw up because of dairy or diabetes. Help. Me.\' should be labeled as Self')
+                                      'ONLY if the tweeter HAS diabetes, label Self.\n'
+                                      'If the tweeter is referring to ANOTHER individual who HAS diabetes, label Other Person\n'
+                                      'Otherwise, label Neither.\n'
+                                      'For example: \'I don\'t know if I threw up because of dairy or diabetes. Help. Me.\' should be labeled as Self\n'
+                                      'Another example: \'If Jim has 50 chocolate bars, and eats 45, what does he have? Diabetes. Jim has diabetes..\' should be labeled as Neither')
 
 
 #--------------- BUILD QUESTIONS ----------------------- 
 
+parsed_tweets_to_annotate_filename = 'diabetes_parsed.txt'
+control_tweets_filename = 'control_tweets.txt'
 
-f = open('diabetes_parsed.txt', 'r')
+
+f = open(parsed_tweets_to_annotate_filename, 'r')
 file_content = f.readlines()
 f.close()
 
-f_2 = open('control_tweets.txt', 'r')
+f_2 = open(control_tweets_filename, 'r')
 control_content = f_2.readlines()
 f_2.close()
 
 question_form = QuestionForm()
 question_form.append(overview)
 
+n = 20 # number of tweets for each hit
+
 
 i = 0
-rand = random.randint(1,20)
-control = control_content[random.randint(0,2)]
+rand = random.randint(1,n)
+control = control_content[random.randint(0,10)]
 for tweet in file_content:
   
-  if i == 20:
-    rand = random.randint(1,20)
-    rand_control = random.randint(0,2)
+  if i == n:
+    rand = random.randint(1,n)
+    rand_control = random.randint(0,10)
     control = control_content[rand_control]
     i = 0
  
@@ -65,7 +69,7 @@ for tweet in file_content:
                    title=title,
                    description=description,
                    keywords=keywords,
-                   duration = 60*5,
+                   duration = 60*10,
                    reward=0.02)
  
     question_form = QuestionForm()

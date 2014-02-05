@@ -4,7 +4,7 @@ from boto.mturk.question import QuestionContent,Question,QuestionForm,Overview,A
  
 ACCESS_ID ='AKIAJDAK4I66WU7O6NVQ'
 SECRET_KEY = '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'
-HOST = 'mechanicalturk.amazonaws.com'
+HOST = 'mechanicalturk.sandbox.amazonaws.com'
  
 mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
                       aws_secret_access_key=SECRET_KEY,
@@ -28,7 +28,7 @@ def format_tweets():
 
 def delete_all_hits():
     hits = mtc.get_all_hits()
-
+    print hits
     for hit in hits:
     	mtc.disable_hit(hit.HITId)
 
