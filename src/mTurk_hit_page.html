@@ -13,29 +13,36 @@
 	var q3 = "Does this person have diabetes?"
 	var q4 = "Is this tweet joking or seriously exaggerating about diabetes?"
 	var q5 = "Does this tweet talk about diabetes as a disease?"
+	var a1 = "Yes"
+	var a2 = "No"
 	for(var i = 0; i < 20; i+=1){
 		var tweet = "tweet"+i
 		document.write('<div id="Tweet"'+i+'>')
 		document.write('<h4>'+(i+1)+'. $ {{'+tweet+'}}</h4>')
 		document.write('<ul>')
-		var a1 = "Yes"
-		var a2 = "No"
 		document.write('<li id="Q'+(2)+'.'+i+'" class="question1'+'-'+i+' content">')
 		document.write('<p>'+q1+'</p>')
 		document.write('<table border="0" cellpadding="0" cellspacing="4">')
 		document.write('<tbody><tr><td valign="center"><input class="q2'+'-'+i+' trigger" data-rel="question2'+'-'+i+'" type="radio" value="Choice1"/></td>')
 		document.write('<td><span class="answertext">'+a1+'</span></td></tr>')
-		document.write('<tr><td valign="center"><input name="Q1'+'-'+i+'" class="q4'+'.'+i+' trigger" data-rel="question4'+'-'+i+'" type="radio" value="Choice2" /></td>')
+		document.write('<tr><td valign="center"><input name="Q1'+'-'+i+'" class="q4'+'-'+i+' trigger" data-rel="question4'+'-'+i+'" type="radio" value="Choice2" /></td>')
 		document.write('<td><span class="answertext">'+a2+'</span></td></tr></tbody></table>')
 		document.write('</li>')
-		for(var k=2; k < 6; k+=1){
-
-			document.write('<li id="Q'+k+'.'+i+'" style="display: none;" class="question'+k+'-'+i+' content">')
+		document.write('<li id="Q'+(3)+'.'+i+'" style="display: none;" class="question2'+'-'+i+' content">')
+		document.write('<p>'+q2+'</p>')
+		document.write('<table border="0" cellpadding="0" cellspacing="4">')
+		document.write('<tbody><tr><td valign="center"><input name="Q2" class="q3'+'-'+i+' trigger" data-rel="question3'+'-'+i+'" type="radio" value="Themselves"/></td>')
+		document.write('<td><span class="answertext">Themselves</span></td></tr>')
+		document.write('<tr><td valign="center"><input name="Q2" class="q3'+'-'+i+' trigger" data-rel="question3'+'-'+i+'" type="radio" value="Another Person" /></td>')
+		document.write('<td><span class="answertext">Another Person</span></td></tr></tbody></table>')
+		document.write('</li>')
+		for(var k=3; k < 6; k+=1){
+			document.write('<li id="Q'+k+'-'+i+'" style="display: none;" class="question'+k+'-'+i+' content">')
 			document.write('<p>'+eval('q'+k)+'</p>')
 			document.write('<table border="0" cellpadding="0" cellspacing="4">')
 			document.write('<tbody><tr><td valign="center"><input class="q'+(k+1)+'-'+i+' trigger" data-rel="question'+(k+1)+'-'+i+'" type="radio" value="Choice1"/></td>')
 			document.write('<td><span class="answertext">'+a1+'</span></td></tr>')
-			document.write('<tr><td valign="center"><input name="Q'+k+'-'+i+'" class="q'+(k+1)+'.'+i+' trigger" data-rel="question'+(k+1)+'-'+i+'" type="radio" value="Choice2" /></td>')
+			document.write('<tr><td valign="center"><input name="Q'+k+'-'+i+'" class="q'+(k+1)+'-'+i+' trigger" data-rel="question'+(k+1)+'-'+i+'" type="radio" value="Choice2" /></td>')
 			document.write('<td><span class="answertext">'+a2+'</span></td></tr></tbody></table>')
 			document.write('</li>')
 		}
