@@ -12,6 +12,12 @@ def parse_labeled_data(filename):
 	file_content = f.readlines()
 
 	i = 1
+
+	one = 0
+	two = 0
+	three = 0
+	limit = 100
+
 	tweets_and_labels = []
 	tweet = ''
 	label = ''
@@ -21,16 +27,26 @@ def parse_labeled_data(filename):
 			tweet = line
 		else:
 			label = line
-			elem = (tweet, int(label))
-			tweets_and_labels.append(elem)
+			l = int(label)
+			elem = (tweet, l)
+			if l == 1 and one < limit:
+				tweets_and_labels.append(elem)
+				one = one + 1
+			elif l == 2 and two < limit:
+				tweets_and_labels.append(elem)
+				two = two + 1
+			elif l == 3 and three < limit:
+				tweets_and_labels.append(elem)
+				three = three + 1
 		i = i + 1
 	return tweets_and_labels
 
 def split_feature_set(tweets):
 	size = len(tweets)
+	half = size / 2
 	i = 0
-	train = tweets[1:500]
-	test = tweets[501:1000]
+	train = tweets[1:half]
+	test = tweets[half:size]
 	return (train, test)
 
 # Given a tweet / string, returns a list of words
@@ -73,8 +89,8 @@ def get_word_features(listoftweets):
 def feature_extractor(doc):
 	docwords = set(doc)
 	features = {}
-	for i in wordlist:
-		features['contains(%s)' % i] = (i in docwords)
+	for i in docwords:
+		features['contains(%s)' % i] = True
 	return features
 
 filename = "../datatxt/parsed/labeled_tweets.txt"
@@ -97,34 +113,22 @@ classifier = nltk.NaiveBayesClassifier.train(training_set)
 
 print classifier.show_most_informative_features(n=100)
 
-# input = "scared"
-# input = input.lower()
-# input = tokenize_tweet(input)
-# features = feature_extractor(input)
-# # print features
-# # output = classifier.classify(features)
-# print input
-# print output
-# # prob = classifier.prob_classify(features)
-# print prob.prob(1)
-# print prob.prob(2)
-# print prob.prob(3)
+input = "got"
+input = input.lower()
+input = tokenize_tweet(input)
+features = feature_extractor(input)
+# print features
+output = classifier.classify(features)
+print input
+print output
+prob = classifier.prob_classify(features)
+print prob.prob(1)
+print prob.prob(2)
+print prob.prob(3)
 
-# i = "this is a bad thing on purpose because i don't care"
-# i = i.lower()
-# i = tokenize_tweet(i)
-# f = feature_extractor(i)
-# # print f
-# o = classifier.classify(f)
-# print i
-# print o
-# p = classifier.prob_classify(f)
-# print p.prob(1)
-# print p.prob(2)
-# print p.prob(3)
-# print classifier.most_informative_features()
+test_set = nltk.classify.apply_features(feature_extractor, test)
 
-print 'test accuracy: ' + str(nltk.classify.accuracy(classifier, test))
+print 'test accuracy: ' + str(nltk.classify.accuracy(classifier, test_set))
 
 
 
