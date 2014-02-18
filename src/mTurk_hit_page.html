@@ -13,161 +13,59 @@
 	var q3 = "Does this person have diabetes?"
 	var q4 = "Is this tweet joking or seriously exaggerating about diabetes?"
 	var q5 = "Does this tweet talk about diabetes as a disease?"
-	for(var i = 0; i < 21; i+=1){
-		if(i == 0){
-			var Tweet0 = "Tweet"+i
-		}
-		else if (i == 1){
-			var Tweet1 = "Tweet"+i
-		}
-		else if (i ==2){
-			var Tweet2 = "Tweet"+i
-		}
-		else if (i ==3){
-			var Tweet3 = "Tweet"+i
-		}
-		else if (i ==4){
-			var Tweet4 = "Tweet"+i
-		}
-		else if (i ==5){
-			var Tweet5 = "Tweet"+i
-		}
-		else if (i ==6){
-			var Tweet6 = "Tweet"+i
-		}
-		else if (i ==7){
-			var Tweet7 = "Tweet"+i
-		}
-		else if (i ==8){
-			var Tweet8 = "Tweet"+i
-		}
-		else if (i ==9){
-			var Tweet9 = "Tweet"+i
-		}
-		else if (i ==10){
-			var Tweet10 = "Tweet"+i
-		}
-		else if (i ==11){
-			var Tweet11 = "Tweet"+i
-		}
-		else if (i ==12){
-			var Tweet12 = "Tweet"+i
-		}
-		else if (i ==13){
-			var Tweet13 = "Tweet"+i
-		}
-		else if (i ==14){
-			var Tweet14 = "Tweet"+i
-		}
-		else if (i ==15){
-			var Tweet15 = "Tweet"+i
-		}else if (i ==16){
-			var Tweet16 = "Tweet"+i
-		}else if (i ==17){
-			var Tweet17 = "Tweet"+i
-		}else if (i ==18){
-			var Tweet18 = "Tweet"+i
-		}else if (i ==19){
-			var Tweet19 = "Tweet"+i
-		}else{
-			var Tweet20 = "Tweet"+i
-		}
+	var a1 = "Yes"
+	var a2 = "No"
+	var Tweet0 = 0
+	var Tweet1 = 1
+	var Tweet2 = 2
+	var Tweet3 = 3
+	var Tweet4 = 4
+	var Tweet5 = 5
+	var Tweet6 = 6
+	var Tweet7 = 7
+	var Tweet8 = 8
+	var Tweet9 = 9
+	var Tweet10 = 10
+	var Tweet11 = 11
+	var Tweet12 = 12
+	var Tweet13 = 13
+	var Tweet14 = 14
+	var Tweet15 = 15
+	var Tweet16 = 16
+	var Tweet17 = 17
+	var Tweet18 = 18
+	var Tweet19 = 19
+	var Tweet20 = 20
+
+
+	for(var i = 0; i < 20; i+=1){
+		var Tweet0 = "tweet"+i
 		document.write('<div id="Tweet"'+i+'>')
-
-		if(i == 0){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet0+'}</h4>')
-		}
-		else if (i ==1){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet1+'}</h4>')
-		}
-		else if (i ==2){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet2+'}</h4>')
-		}
-		else if (i ==3){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet3+'}</h4>')
-		}
-		else if (i ==4){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet4+'}</h4>')
-
-		}
-		else if (i ==5){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet5+'}</h4>')
-
-		}
-		else if (i ==6){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet6+'}</h4>')
-
-		}
-		else if (i ==7){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet7+'}</h4>')
-
-		}
-		else if (i ==8){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet8+'}</h4>')
-
-		}
-		else if (i ==9){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet9+'}</h4>')
-
-		}
-		else if (i ==10){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet10+'}</h4>')
-
-		}
-		else if (i ==11){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet11+'}</h4>')
-
-		}
-		else if (i ==12){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet12+'}</h4>')
-
-		}
-		else if (i ==13){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet13+'}</h4>')
-
-		}
-		else if (i ==14){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet14+'}</h4>')
-
-		}
-		else if (i ==15){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet15+'}</h4>')
-
-		}else if (i ==16){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet16+'}</h4>')
-
-		}else if (i ==17){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet17+'}</h4>')
-
-		}else if (i ==18){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet18+'}</h4>')
-
-		}else if (i ==19){
-			document.write('<h4>'+(i+1)+'. ${'+Tweet19+'}</h4>')
-
-		}else{
-			document.write('<h4>'+(i+1)+'. ${'+Tweet20+'}</h4>')
-
-		}
+		document.write('<h4>'+(i+1)+'. ${Tweet'+i+'}</h4>')
 		document.write('<ul>')
 		document.write('<li id="Q'+(2)+'.'+i+'" class="question1'+'-'+i+' content">')
 		document.write('<p>'+q1+'</p>')
 		document.write('<table border="0" cellpadding="0" cellspacing="4">')
 		document.write('<tbody><tr><td valign="center"><input class="q2'+'-'+i+' trigger" data-rel="question2'+'-'+i+'" type="radio" value="Choice1"/></td>')
+		document.write('<td><span class="answertext">'+a1+'</span></td></tr>')
+		document.write('<tr><td valign="center"><input name="Q1'+'-'+i+'" class="q4'+'-'+i+' trigger" data-rel="question4'+'-'+i+'" type="radio" value="Choice2" /></td>')
+		document.write('<td><span class="answertext">'+a2+'</span></td></tr></tbody></table>')
+		document.write('</li>')
+		document.write('<li id="Q'+(3)+'.'+i+'" style="display: none;" class="question2'+'-'+i+' content">')
+		document.write('<p>'+q2+'</p>')
+		document.write('<table border="0" cellpadding="0" cellspacing="4">')
+		document.write('<tbody><tr><td valign="center"><input name="Q2" class="q3'+'-'+i+' trigger" data-rel="question3'+'-'+i+'" type="radio" value="Themselves"/></td>')
 		document.write('<td><span class="answertext">Themselves</span></td></tr>')
-		document.write('<tr><td valign="center"><input name="Q1'+'-'+i+'" class="q4'+'.'+i+' trigger" data-rel="question4'+'-'+i+'" type="radio" value="Choice2" /></td>')
+		document.write('<tr><td valign="center"><input name="Q2" class="q3'+'-'+i+' trigger" data-rel="question3'+'-'+i+'" type="radio" value="Another Person" /></td>')
 		document.write('<td><span class="answertext">Another Person</span></td></tr></tbody></table>')
 		document.write('</li>')
-		var a1 = "Yes"
-		var a2 = "No"
-		for(var k=2; k < 6; k+=1){
-
-			document.write('<li id="Q'+k+'.'+i+'" style="display: none;" class="question'+k+'-'+i+' content">')
+		for(var k=3; k < 6; k+=1){
+			document.write('<li id="Q'+k+'-'+i+'" style="display: none;" class="question'+k+'-'+i+' content">')
 			document.write('<p>'+eval('q'+k)+'</p>')
 			document.write('<table border="0" cellpadding="0" cellspacing="4">')
 			document.write('<tbody><tr><td valign="center"><input class="q'+(k+1)+'-'+i+' trigger" data-rel="question'+(k+1)+'-'+i+'" type="radio" value="Choice1"/></td>')
 			document.write('<td><span class="answertext">'+a1+'</span></td></tr>')
-			document.write('<tr><td valign="center"><input name="Q'+k+'-'+i+'" class="q'+(k+1)+'.'+i+' trigger" data-rel="question'+(k+1)+'-'+i+'" type="radio" value="Choice2" /></td>')
+			document.write('<tr><td valign="center"><input name="Q'+k+'-'+i+'" class="q'+(k+1)+'-'+i+' trigger" data-rel="question'+(k+1)+'-'+i+'" type="radio" value="Choice2" /></td>')
 			document.write('<td><span class="answertext">'+a2+'</span></td></tr></tbody></table>')
 			document.write('</li>')
 		}
@@ -183,4 +81,3 @@ $('.trigger').click(function() {
     $('.' + $(this).data('rel')).show();
 });
 </script>
-
