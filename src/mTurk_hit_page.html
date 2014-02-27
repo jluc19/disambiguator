@@ -19,35 +19,42 @@
 	var tweets = ['${Tweet0}', '${Tweet1}','${Tweet2}','${Tweet3}','${Tweet4}','${Tweet5}','${Tweet6}','${Tweet7}','${Tweet8}','${Tweet9}','${Tweet10}', '${Tweet11}', '${Tweet12}', '${Tweet13}', '${Tweet14}', '${Tweet15}', '${Tweet16}', '${Tweet17}', '${Tweet18}', '${Tweet19}', '${Tweet20}']
 
 	for(var i = 0; i < 20; i+=1){
-		var t = String.fromCharCode(96 + i)
-		var q = String.fromCharCode(97 + i)
+		var t = String.fromCharCode(97 + i)
+		var q = String.fromCharCode(98 + i)
 		document.write('<div id="Tweet"'+i+'>')
 		document.write('<h4>'+(i+1)+'. '+tweets[i]+'</h4>')
 		document.write('<ul>')
 		document.write('<li id="question1'+t+'">')
 		document.write('<p>'+q1+'</p>')
-		document.write('<table border="0" cellpadding="0" cellspacing="4">')
-		document.write('<tbody><tr><td valign="center"><input name="q1'+q+'" id="q2'+t+'" onClick="hideVar(question1'+t+', question2'+t+')" type="radio" value="Yes"/></td>')
+		document.write('<table border="0" cellpadding="0" cellspacing="4"><tbody>')
+		document.write('<tr><td valign="center"><input name="q1'+q+'" id="q2'+t+'" onClick="hideVar(question1'+t+', question2'+t+')" type="radio" value="Yes"/></td>')
 		document.write('<td><span class="answertext">'+a1+'</span></td></tr>')
-		document.write('<tr><td valign="center"><input name="q1'+q+'" id="q4'+t+'" onClick="hideVar(question1'+t+', question4'+t+')" type="radio" value="No" /></td>')
+		document.write('<tr><td valign="center"><input name="q1'+q+'" id="q4'+t+'" onClick="hideVar(question1'+t+', question4'+t+');radioAnswer(q3'+t+'NULL, q4'+t+'NULL)" type="radio" value="No" /></td>')
 		document.write('<td><span class="answertext">'+a2+'</span></td></tr></tbody></table>')
 		document.write('</li>')
+
 		document.write('<li style="display: none;" id="question2'+t+'">')
 		document.write('<p>'+q2+'</p>')
-		document.write('<table border="0" cellpadding="0" cellspacing="4">')
-		document.write('<tbody><tr><td valign="center"><input name="q2'+q+'" id="q3'+t+'" onClick="hideVar(question2'+t+', question3'+t+')" type="radio" value="Themselves"/></td>')
+		document.write('<table border="0" cellpadding="0" cellspacing="4"><tbody>')
+		document.write('<tr><td valign="center"><input name="q2'+q+'" id="q3'+t+'" onClick="hideVar(question2'+t+', question3'+t+')" type="radio" value="Themselves"/></td>')
 		document.write('<td><span class="answertext">Themselves</span></td></tr>')
 		document.write('<tr><td valign="center"><input name="q2'+q+'" id="q3'+t+'" onClick="hideVar(question2'+t+', question3'+t+')" type="radio" value="Another Person"/></td>')
-		document.write('<td><span class="answertext">Another Person</span></td></tr></tbody></table>')
+		document.write('<td><span class="answertext">Another Person</span></td></tr>')
+		document.write('<tr><td valign="center"><input name="q2'+q+'" id="q3'+t+'NULL" type="radio" value="NULL" style="display: none;"/></td>')
+		document.write('</tr></tbody></table>')
 		document.write('</li>')
 		for(var k=3; k < 6; k+=1){
 			document.write('<li style="display: none;" id="question'+k+t+'">')
 			document.write('<p>'+eval('q'+k)+'</p>')
-			document.write('<table border="0" cellpadding="0" cellspacing="4">')
-			document.write('<tbody><tr><td valign="center"><input name="q'+k+q+'" id="q'+(k+1)+t+'" onClick="hideVar(question'+k+t+', question'+(k+1)+t+')" type="radio" value="Yes"/></td>')
+			document.write('<table border="0" cellpadding="0" cellspacing="4"><tbody>')
+			document.write('<tr><td valign="center"><input name="q'+k+q+'" id="q'+(k+1)+t+'" onClick="hideVar(question'+k+t+', question'+(k+1)+t+')" type="radio" value="Yes"/></td>')
 			document.write('<td><span class="answertext">'+a1+'</span></td></tr>')
 			document.write('<tr><td valign="center"><input name="q'+k+q+'" id="q'+(k+1)+t+'" onClick="hideVar(question'+k+t+', question'+(k+1)+t+')" type="radio" value="No" /></td>')
-			document.write('<td><span class="answertext">'+a2+'</span></td></tr></tbody></table>')
+			document.write('<td><span class="answertext">'+a2+'</span></td></tr>')
+			if(k==3){
+				document.write('<tr><td valign="center"><input name="q'+k+q+'" id="q'+(k+1)+t+'NULL" type="radio" value="NULL" style="display: none;"/></td></tr>')
+			}
+			document.write('</tbody></table>')
 			document.write('</li>')
 		}
 		document.write('<li style="display: none;" id="question6'+t+'">COMPLETE</li>')
@@ -55,11 +62,16 @@
 		document.write('</div>')
 	}
 </script>
-
 <script language="JavaScript">
 function hideVar(li_curr, li_next){
 	$(li_curr).hide()
 	$(li_next).show()
+}
+</script>
+<script language="JavaScript">
+function radioAnswer(id2, id3){
+	$(id2).attr('checked', true);
+	$(id3).attr('checked', true);
 }
 </script>
 </body>
