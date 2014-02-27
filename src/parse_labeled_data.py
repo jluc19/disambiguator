@@ -1,5 +1,6 @@
 import nltk
 from nltk.corpus import stopwords
+from nltk.util   import ngrams
 
 custom_stopwords = []
 wordlist = []
@@ -62,28 +63,25 @@ def tokenize_tweet(tweet):
 
 	return words
 
-# Returns a list of all words in our corpus given a list of tuples of the 
-# form ("This is a tweet", 3)
-def get_word_list(corpus):
+# features set with ngrams
+
+# Returns a featureset based on ngrams
+def ngrams_features(corpus, n=1):
 	words = []
 	for (tweet, label) in corpus:
-		words_in_tweet = tokenize_tweet(tweet)
+		gramsdict = {}
+		for i in range(n):
+			if i == 0 :
+				grams = tokenize_tweet(tweet)
+			else:
+				grams = ngrams(tokenize_tweet(tweet), i + 1)
+			for gr in grams:
+				gramsdict[gr] = True
+
+		#words_in_tweet = tokenize_tweet(tweet)
+		#words_in_tweet = ngrams(words_in_tweet, n)
 		# print (words_in_tweet, label)
-		words.append((words_in_tweet, label))
-	return words
-
-#Pull out all of the words in a list of tagged tweets, formatted in tuples.
-def get_words_from_list(words_list):
-	allwords = []
-	for (words, sentiment) in words_list:
-		allwords.extend(words)
-	return allwords
-
-#Order a list of tweets by their frequency.
-def get_word_features(listoftweets):
-	#Print out wordfreq if you want to have a look at the individual counts of words.
-	wordfreq = nltk.FreqDist(listoftweets)
-	words = wordfreq.keys()
+		words.append((gramsdict, label))
 	return words
 
 def feature_extractor(doc):
@@ -96,42 +94,31 @@ def feature_extractor(doc):
 filename = "../datatxt/parsed/labeled_tweets.txt"
 data = parse_labeled_data(filename)
 
-tweets = get_word_list(data)
+tweets = ngrams_features(data, 3)
 
 (train, test) = split_feature_set(tweets)
 
-allwords = get_words_from_list(tweets)
-word_freqs = get_word_features(allwords)
-
-wordlist = allwords
-
 #Creates a training set - classifier learns distribution of true/falses in the input.
-training_set = nltk.classify.apply_features(feature_extractor, train)
+#training_set = nltk.classify.apply_features(feature_extractor, train)
 
 # classifier
-classifier = nltk.NaiveBayesClassifier.train(training_set)
+classifier = nltk.NaiveBayesClassifier.train(train)
 
 print classifier.show_most_informative_features(n=100)
 
 input = "got"
 input = input.lower()
 input = tokenize_tweet(input)
-features = feature_extractor(input)
-# print features
-output = classifier.classify(features)
 print input
-print output
+features = feature_extractor(input)
+print features
+output = classifier.classify(features)
+
 prob = classifier.prob_classify(features)
 print prob.prob(1)
 print prob.prob(2)
 print prob.prob(3)
 
-test_set = nltk.classify.apply_features(feature_extractor, test)
+#test_set = nltk.classify.apply_features(feature_extractor, test)
 
-print 'test accuracy: ' + str(nltk.classify.accuracy(classifier, test_set))
-
-
-
-
-
-
+print 'test accuracy: ' + str(nltk.classify.accuracy(classifier, test))

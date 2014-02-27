@@ -25,6 +25,19 @@ def parse_file(filename) :
 	random.shuffle(label_tweet)
 	return set(label_tweet)
 
+def parse_file_2(filename):
+	f = open(filename, 'r')
+	file_contents = f.readlines()
+	label_tweet = []
+	i = 1
+	tweet = ""
+	label = ""
+	for lines in file_contents:
+		if i % 1 ==  
+		f_line = remove_non_ascii_1(lines)
+
+
+
 
 def bigram_word_feats(words, score_fn=BigramAssocMeasures.likelihood_ratio, n=200):
     bigram_finder = BigramCollocationFinder.from_words(words)
@@ -34,7 +47,7 @@ def bigram_word_feats(words, score_fn=BigramAssocMeasures.likelihood_ratio, n=20
 def unigram(tweet):
 	return dict([(ngram,True) for ngram in nltk.word_tokenize(tweet)]) 
 
-label_tweet = parse_file("annotated_tweets.txt")
+label_tweet = parse_file("labeled_tweet.txt")
 
 
 
@@ -79,6 +92,7 @@ def unigrams():
 	test_set, train_set = splitFeatureSet(featureset)
 	classifier = nltk.NaiveBayesClassifier.train(train_set)
 	print classifier.show_most_informative_features(100)
+	print featureset
 	print 'Test accuracy: ' + str(nltk.classify.accuracy(classifier, test_set))
 
 #maxEnt
@@ -89,7 +103,7 @@ def maxEnt():
 
 
 
-bigrams()
+#bigrams()
 unigrams()
 #maxEnt()
 
