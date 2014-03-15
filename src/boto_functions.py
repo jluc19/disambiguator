@@ -11,17 +11,23 @@ mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
                       host=HOST)
 
 def format_tweets():
-	f = open('diabetes.txt', 'r')
+	f = open('unparsed_tweets_scraped.csv', 'r')
 	file_content = f.readlines()
-	w = open('diabetes_parsed.txt', 'w')
+	f_c  = []
+	for l in file_content:
+		f_c = l.split("\r")
+	w = open('parsed_tweets_scraped.csv', 'w')
 
-	non_dup = list(set(file_content))
+	non_dup = list(set(f_c))
 	for line in non_dup:
 		tup = langid.classify(line)
 		if "en" in tup:
-			if not line.startswith("RT"):
-				if not "http" in line:
-					w.write(line)
+			line = line.translate(None, '"')
+			line = '\"' + line + '\"'
+			if "diabetes" in line:
+				if not line.startswith("\"RT"):
+					if not "http" in line and not "https" in line:
+						w.write(line + "\n")
 
 	f.close()
 	w.close()
@@ -33,4 +39,4 @@ def delete_all_hits():
     	mtc.disable_hit(hit.HITId)
 
 
-delete_all_hits()
+format_tweets()
