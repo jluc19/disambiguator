@@ -23,6 +23,10 @@ def format_tweets():
 		tup = langid.classify(line)
 		if "en" in tup:
 			line = line.translate(None, '"')
+			line = line.translate(None, "'")
+			line = line.translate(None, "`")
+			if line.startswith('='):
+				line = line[1:]
 			line = '\"' + line + '\"'
 			if "diabetes" in line:
 				if not line.startswith("\"RT"):
