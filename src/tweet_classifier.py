@@ -37,7 +37,8 @@ def parse_labeled_data(filename):
 			elif l == 2 and two < limit:
 				tweets_and_labels.append(elem)
 				two = two + 1
-			elif l == 3 and three < limit:
+			elif (l == 3 or l == 4) and three < limit:
+				elem = (tweet, 3)
 				tweets_and_labels.append(elem)
 				three = three + 1
 		i = i + 1
@@ -64,61 +65,50 @@ def tokenize_tweet(tweet):
 
 	return words
 
-# Returns a featureset based on ngrams
-# if n = 3, will return unigrams, bigrams and trigrams
-def ngrams_features(corpus, n=1):
-	words = []
-	for (tweet, label) in corpus:
-		gramsdict = {}
-		for i in range(n):
-			if i == 0 :
-				grams = tokenize_tweet(tweet)
-			else:
-				grams = ngrams(tokenize_tweet(tweet), i + 1)
-			for gr in grams:
-				gramsdict[gr] = True
-		words.append((gramsdict, label))
-	return words
-
-def feature_extractor(doc):
-	docwords = set(doc)
-	features = {}
-	for i in docwords:
-		features['contains(%s)' % i] = True
-	return features
+# 	Returns a featureset based on ngrams
+# 	if n = 3, will return unigrams, bigrams and trigrams
+#	INPUT  : 1 tweet (string)
+# 	OUTPUT : dictionary. key = gram, value = True
+def ngrams_features(tweet, n=1):
+	gramsdict = {}
+	tweet_as_tokens = tokenize_tweet(tweet)
+	for i in range(n):
+		if i == 0 :
+			grams = tweet_as_tokens
+		else:
+			grams = ngrams(tweet_as_tokens, i + 1)
+		for gr in grams:
+			gramsdict[gr] = True
+	return gramsdict
 
 ###		ACTUAL STUFF	###
 filename = "../datatxt/parsed/labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
 random.shuffle(tweets_and_labels)
 
-tweets = ngrams_features(tweets_and_labels, 2)
+features_for_tweets = [(ngrams_features(t, 2), l) for (t, l) in tweets_and_labels]
 
-(train, test) = split_feature_set(tweets)
-
-#Creates a training set - classifier learns distribution of true/falses in the input.
-#training_set = nltk.classify.apply_features(feature_extractor, train)
+(train, test) = split_feature_set(features_for_tweets)
 
 # classifier
 classifier = nltk.NaiveBayesClassifier.train(train)
 
 print classifier.show_most_informative_features(n=100)
 
-input = "got"
+input = 'i just got diabetes the other day'
 input = input.lower()
-input = tokenize_tweet(input)
-print input
-features = feature_extractor(input)
+input_list = tokenize_tweet(input)
+print 'input is ' + str(input_list)
+features = ngrams_features(input, 2)
 print features
 output = classifier.classify(features)
-print 'got: ' + str(output)
+print 'output: ' + str(output)
 
 prob = classifier.prob_classify(features)
 print prob.prob(1)
 print prob.prob(2)
 print prob.prob(3)
 
-#test_set = nltk.classify.apply_features(feature_extractor, test)
 test_accuracy = nltk.classify.accuracy(classifier, test)
 
 print 'test accuracy: ' + str(test_accuracy)
