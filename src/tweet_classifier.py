@@ -2,6 +2,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.util   import ngrams
 import random
+import math
 
 custom_stopwords = []
 wordlist = []
@@ -18,7 +19,7 @@ def parse_labeled_data(filename):
 	one = 0
 	two = 0
 	three = 0
-	limit = 100
+	limit = 200
 
 	tweets_and_labels = []
 	tweet = ''
@@ -42,14 +43,16 @@ def parse_labeled_data(filename):
 				tweets_and_labels.append(elem)
 				three = three + 1
 		i = i + 1
+	print 'we got ' + str(one) + ' tweets labeled with a 1'
+	print 'we got ' + str(two) + ' tweets labeled with a 2'
+	print 'we got ' + str(three) + ' tweets labeled with a 3'
 	return tweets_and_labels
 
 def split_feature_set(tweets):
 	size = len(tweets)
-	half = size / 2
-	i = 0
-	train = tweets[1:half]
-	test = tweets[half:size]
+	split = int(math.ceil(0.8 * size))
+	train = tweets[1:split]
+	test = tweets[split:]
 	return (train, test)
 
 # Given a tweet / string, returns a list of words
@@ -80,6 +83,8 @@ def ngrams_features(tweet, n=1):
 		for gr in grams:
 			gramsdict[gr] = True
 	return gramsdict
+
+
 
 ###		ACTUAL STUFF	###
 filename = "../datatxt/parsed/labeled_tweets.txt"
