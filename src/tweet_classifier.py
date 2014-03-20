@@ -72,8 +72,8 @@ def tokenize_tweet(tweet):
 # 	if n = 3, will return unigrams, bigrams and trigrams
 #	INPUT  : 1 tweet (string)
 # 	OUTPUT : dictionary. key = gram, value = True
-def ngrams_features(tweet, n=1):
-	gramsdict = {}
+def ngrams_features(tweet, frequency_dictionary, n=1, min_freq=3):
+	gram_features = {}
 	tweet_as_tokens = tokenize_tweet(tweet)
 	for i in range(n):
 		if i == 0 :
@@ -81,22 +81,50 @@ def ngrams_features(tweet, n=1):
 		else:
 			grams = ngrams(tweet_as_tokens, i + 1)
 		for gr in grams:
-			gramsdict[gr] = True
-	return gramsdict
+			if gr in frequency_dictionary:
+			    if frequency_dictionary[gr] >= min_freq:
+			        gram_features[gr] = True
+	return gram_features
+
+def get_ngram_frequencies(tweets_and_labels, n=1):
+    d = {}
+    for (t, l) in tweets_and_labels:
+    	tokens = tokenize_tweet(t)
+    	for i in range(n):
+    		if i == 0:
+    			grams = tokens
+    		else:
+    		    grams = ngrams(tokens, i + 1)
+    		for gr in grams:
+    		    if gr in d:
+    		    	num = d[gr]
+    		    	d[gr] = num + 1
+    		    else:
+    		    	d[gr] = 1
+    return d
 
 
 
 ###		ACTUAL STUFF	###
+# 1. Open labeled data, parse into tuples
+n = 2
+# min_freq = 3
 filename = "../datatxt/parsed/labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
 random.shuffle(tweets_and_labels)
 
-features_for_tweets = [(ngrams_features(t, 2), l) for (t, l) in tweets_and_labels]
+# 2. Create frequency dictionary of all words and tuples
+frequency_dictionary = get_ngram_frequencies(tweets_and_labels, n)
 
+# 3. get features out of tweets!
+features_for_tweets = [(ngrams_features(t, frequency_dictionary, n), l) for (t, l) in tweets_and_labels]
+
+# 4. Split data into training, test set
 (train, test) = split_feature_set(features_for_tweets)
 
-# classifier
+# 5. Train classifier!
 classifier = nltk.NaiveBayesClassifier.train(train)
+# classifier = nltk.DecisionTreeClassifier.train(train)
 
 print classifier.show_most_informative_features(n=100)
 
@@ -104,7 +132,7 @@ input = 'i just got diabetes the other day'
 input = input.lower()
 input_list = tokenize_tweet(input)
 print 'input is ' + str(input_list)
-features = ngrams_features(input, 2)
+features = ngrams_features(input, frequency_dictionary, n)
 print features
 output = classifier.classify(features)
 print 'output: ' + str(output)
@@ -114,8 +142,10 @@ print prob.prob(1)
 print prob.prob(2)
 print prob.prob(3)
 
+train_accuracy = nltk.classify.accuracy(classifier, train)
 test_accuracy = nltk.classify.accuracy(classifier, test)
 
+print 'train accuracy:' + str(train_accuracy)
 print 'test accuracy: ' + str(test_accuracy)
 
 
