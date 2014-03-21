@@ -13,20 +13,16 @@ mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
 def format_tweets():
 	f = open('unparsed_tweets_scraped.csv', 'r')
 	file_content = f.readlines()
-	f_c  = []
-	for l in file_content:
-		f_c = l.split("\r")
+	
+	
 	w = open('parsed_tweets_scraped.csv', 'w')
 
-	non_dup = list(set(f_c))
+	non_dup = list(set(file_content))
 	for line in non_dup:
+		line = line.replace("\n", "")
 		tup = langid.classify(line)
 		if "en" in tup:
 			line = line.translate(None, '"')
-			line = line.translate(None, "'")
-			line = line.translate(None, "`")
-			if line.startswith('='):
-				line = line[1:]
 			line = '\"' + line + '\"'
 			if "diabetes" in line:
 				if not line.startswith("\"RT"):
