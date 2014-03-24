@@ -38,5 +38,11 @@ def delete_all_hits():
     for hit in hits:
     	mtc.disable_hit(hit.HITId)
 
+def format_csv():
+	f = open('parsed_tweets_scraped.csv', 'r')
+	f = open('control_tweets.csv', 'r')
+	file_content = list(f.readlines())
+	w = open('tweets_for_mTurk.csv', 'w')
+
 
 format_tweets()
