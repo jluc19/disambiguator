@@ -152,18 +152,19 @@ print 'test accuracy: ' + str(test_accuracy)
 fname1 = "../datatxt/unparsed_tweets_scraped.csv"
 f1 = open(fname1, 'r')
 content = f1.readlines()
-fname2 = "../datatxt/classified_tweets"
+fname2 = "../datatxt/classified_tweets_1_2"
 f2 = open(fname2, 'w')
 for line in content:
 	tweet = line.lower()
 	tweet_tok = tokenize_tweet(tweet)
 	feat = ngrams_features(line, frequency_dictionary, n)
 	prediction = classifier.classify(feat)
-	prob = classifier.prob_classify(feat)
-	p = prob.prob(prediction)
-	f2.write(line)
-	f2.write(str(prediction)+'\n')
-	f2.write(str(p)+'\n')
+	#prob = classifier.prob_classify(feat)
+	#p = prob.prob(prediction)
+	if prediction == 1 or prediction == 2:
+		f2.write(line)
+	#f2.write(str(prediction)+'\n')
+	#f2.write(str(p)+'\n')
 
 f1.close()
 f2.close()
