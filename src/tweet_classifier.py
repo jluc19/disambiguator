@@ -128,6 +128,7 @@ classifier = nltk.NaiveBayesClassifier.train(train)
 
 print classifier.show_most_informative_features(n=100)
 
+
 input = 'i just got diabetes the other day'
 input = input.lower()
 input_list = tokenize_tweet(input)
@@ -148,5 +149,22 @@ test_accuracy = nltk.classify.accuracy(classifier, test)
 print 'train accuracy:' + str(train_accuracy)
 print 'test accuracy: ' + str(test_accuracy)
 
+fname1 = "../datatxt/unparsed_tweets_scraped.csv"
+f1 = open(fname1, 'r')
+content = f1.readlines()
+fname2 = "../datatxt/classified_tweets"
+f2 = open(fname2, 'w')
+for line in content:
+	tweet = line.lower()
+	tweet_tok = tokenize_tweet(tweet)
+	feat = ngrams_features(line, frequency_dictionary, n)
+	prediction = classifier.classify(feat)
+	prob = classifier.prob_classify(feat)
+	p = prob.prob(prediction)
+	f2.write(line)
+	f2.write(str(prediction)+'\n')
+	f2.write(str(p)+'\n')
 
-
+f1.close()
+f2.close()
+print "Classifying completed"
