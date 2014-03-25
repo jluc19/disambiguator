@@ -53,7 +53,7 @@ def format_csv():
 	wr = csv.writer(output, quoting=csv.QUOTE_ALL)
 	while 1:
 		hit = []
-		for i in range(19):
+		for i in range(20):
 			if(i==5 or i == 15):
 				hit.append(random.choice(control).strip())
 			else:
@@ -65,5 +65,5 @@ def format_csv():
 		wr.writerow(hit)
 
 
-#format_tweets()
+format_tweets()
 format_csv()
