@@ -4,10 +4,16 @@
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import svm
 
+sentiments = [1, 2, 3]
+dv = DictVectorizer()
+le = LabelEncoder()
+
 corpus = ['I have diabetes',
 			'You have diabetes',
 			'He has diabetes',
 			'She has diabetes']
+
+
 
 vectorizer = CountVectorizer(min_df=1, ngram_range=(1,2))
 
