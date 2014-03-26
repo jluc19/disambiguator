@@ -3,8 +3,11 @@
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction import DictVectorizer
+from sklearn.cross_validation import train_test_split
+from sklearn.metrics import classification_report
 from sklearn import svm
 import random
+from sklearn.feature_selection import SelectFwe
 
 sentiments = [1, 2, 3]
 dv = DictVectorizer()
@@ -49,7 +52,7 @@ def parse_labeled_data(filename):
 	print 'we got ' + str(three) + ' tweets labeled with a 3'
 	return tweets_and_labels
 
-def normalize(tweet): return [t for t in tweet.lower().split()]
+def normalize(tweet): return [t for t in tweet.lower().split()] #use NLTK
 
 def ngrams(iterable, n=1):
 	l = len(iterable)
@@ -71,7 +74,9 @@ def get_features(data) :
 		tweet_feat = ngram_features(toks, 2)
 		feat.append(tweet_feat)
 
-	return dv.fit_transform(feat)
+	feats = dv.fit_transform(feat)
+	print dv.get_feature_names()
+	return feats
 
 def get_x_y(data):
 	le.fit(sentiments)
@@ -84,13 +89,44 @@ def get_x_y(data):
 
 filename = "labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
-random.shuffle(tweets_and_labels)
+#random.shuffle(tweets_and_labels)
 Y, X = get_x_y(tweets_and_labels)
-print Y
-print X
-clf = svm.SVC()
-clf.fit(X, Y)
-print clf
+
+#splitting training and test set
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+
+#C = regularization parameter (keeps from overfitting): C is the degree of penalty (L1 or L2) (powers of 10)
+#penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
+#TODO: separate into train test eval
+
+fs = SelectFwe(alpha=250.0)
+print "Before", x_train.shape
+x_train = fs.fit_transform(x_train, y_train)
+print "After", x_train.shape
+clf = svm.LinearSVC(C=10000.0, penalty = 'l2', dual=False)
+clf.fit(x_train, y_train)
+print "Training Accuracy"
+print (classification_report(y_train, clf.predict(x_train)))
+
+x_test = fs.transform(x_test)
+
+print "Testing Accuracy"
+print (classification_report(y_test, clf.predict(x_test)))
+
+
+
+
+
+
+
+
+#output report of model success
+
+
+
+
+
+
 
 #junk
 #tw = ["I have diabetes"]
