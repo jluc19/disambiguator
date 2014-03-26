@@ -92,3 +92,9 @@ clf = svm.SVC()
 clf.fit(X, Y)
 print clf
 
+#junk
+#tw = ["I have diabetes"]
+#imp = get_features(tw)
+#print imp
+#clf.predict([imp])
+
