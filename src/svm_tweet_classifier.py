@@ -90,4 +90,5 @@ print Y
 print X
 clf = svm.SVC()
 clf.fit(X, Y)
+print clf
 
