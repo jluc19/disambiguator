@@ -1,6 +1,9 @@
 #Tweet classifier using SVM
 #Boyang Zhang and Jason Lucibello
 
+import nltk
+import itertools
+
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.cross_validation import train_test_split
@@ -52,7 +55,7 @@ def parse_labeled_data(filename):
 	print 'we got ' + str(three) + ' tweets labeled with a 3'
 	return tweets_and_labels
 
-def normalize(tweet): return [t for t in tweet.lower().split()] #use NLTK
+def normalize(tweet): return [t for t in nltk.word_tokenize(tweet)] #use NLTK
 
 def ngrams(iterable, n=1):
 	l = len(iterable)
@@ -103,7 +106,7 @@ fs = SelectFwe(alpha=250.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
-clf = svm.LinearSVC(C=10000.0, penalty = 'l2', dual=False)
+clf = svm.LinearSVC(C=.01, penalty = 'l2', dual=False)
 clf.fit(x_train, y_train)
 print "Training Accuracy"
 print (classification_report(y_train, clf.predict(x_train)))
