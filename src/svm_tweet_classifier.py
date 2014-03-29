@@ -23,15 +23,16 @@ def parse_labeled_data(filename):
 
 	i = 1
 
-	one = 0
-	two = 0
-	three = 0
-	limit = 200
+	ones = []
+	twos = []
+	threes = []
 
 	tweets_and_labels = []
 	tweet = ''
 	label = ''
 	for line in file_content:
+		if line.startswith('###'):
+            continue
 		line = line.rstrip('\n')
 		if i % 2 == 1:
 			tweet = line
@@ -39,23 +40,45 @@ def parse_labeled_data(filename):
 			label = line
 			l = int(label)
 			elem = (tweet, l)
-			if l == 1 and one < limit:
+			if l == 1:
 				tweets_and_labels.append(elem)
-				one = one + 1
-			elif l == 2 and two < limit:
+				ones.append(elem)
+			elif l == 2:
 				tweets_and_labels.append(elem)
-				two = two + 1
-			elif (l == 3 or l == 4) and three < limit:
+				twos.append(elem)
+			elif (l == 3 or l == 4):
 				elem = (tweet, 3)
-				tweets_and_labels.append(elem)
-				three = three + 1
+				threes.append(elem)
 		i = i + 1
-	print 'we got ' + str(one) + ' tweets labeled with a 1'
-	print 'we got ' + str(two) + ' tweets labeled with a 2'
-	print 'we got ' + str(three) + ' tweets labeled with a 3'
+	print 'we got ' + str(len(ones)) + ' tweets labeled with a 1'
+	print 'we got ' + str(len(twos)) + ' tweets labeled with a 2'
+	print 'we got ' + str(len(threes)) + ' tweets labeled with a 3'
+	smallest = min([len(l) for l in [ones, twos, threes]])
+	print 'smallest list is of size' + str(smallest)
+	random.shuffle(ones)
+	random.shuffle(twos)
+	random.shuffle(threes)
+	ones = ones[:smallest]
+	twos = twos[:smallest]
+	threes = threes[:smallest]
+	tweets_and_labels.extend(ones)
+	tweets_and_labels.extend(twos)
+	tweets_and_labels.extend(threes)
+	random.shuffle(tweets_and_labels)
 	return tweets_and_labels
 
-def normalize(tweet): return [t for t in nltk.word_tokenize(tweet)] #use NLTK
+def normalize(tweet): 
+	# get rid of certain punctuation chars
+	symbols_to_eliminate = ['.', '-', ',']
+	for symbol in symbols_to_eliminate:
+		tweet.replace(symbol, '')
+
+	toks = nltk.word_tokenize(tweet)
+
+	# only take words - things with letters ONLY 
+	# toks = [w for w in toks if w.isalpha()]
+
+	return toks
 
 def ngrams(iterable, n=1):
 	l = len(iterable)
@@ -101,7 +124,7 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
 #TODO: separate into train test eval
 
-fs = SelectFwe(alpha=250.0)
+fs = SelectFwe(alpha=275.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
