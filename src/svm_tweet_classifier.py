@@ -32,7 +32,7 @@ def parse_labeled_data(filename):
 	label = ''
 	for line in file_content:
 		if line.startswith('###'):
-            continue
+			continue
 		line = line.rstrip('\n')
 		if i % 2 == 1:
 			tweet = line
