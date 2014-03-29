@@ -62,7 +62,6 @@ def ngrams(iterable, n=1):
 	for idx in range(l):
 		if idx + n < l : yield iterable[idx:idx+n]
 
-
 #returns all n grams in toks
 def ngram_features(toks, n=1) : 
 	n_dict = {}
