@@ -100,7 +100,7 @@ def get_features(data) :
 		feat.append(tweet_feat)
 
 	feats = dv.fit_transform(feat)
-	print dv.get_feature_names()
+	#print dv.get_feature_names()
 	return feats
 
 def get_x_y(data):
@@ -137,25 +137,3 @@ x_test = fs.transform(x_test)
 
 print "Testing Accuracy"
 print (classification_report(y_test, clf.predict(x_test)))
-
-
-
-
-
-
-
-
-#output report of model success
-
-
-
-
-
-
-
-#junk
-#tw = ["I have diabetes"]
-#imp = get_features(tw)
-#print imp
-#clf.predict([imp])
-
