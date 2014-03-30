@@ -100,7 +100,6 @@ def get_features(data) :
 		feat.append(tweet_feat)
 
 	feats = dv.fit_transform(feat)
-	#print dv.get_feature_names()
 	return feats
 
 def get_x_y(data):
@@ -112,13 +111,13 @@ def get_x_y(data):
 
 #random.shuffle
 
-filename = "labeled_tweets.txt"
+filename = "new_labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
 #random.shuffle(tweets_and_labels)
 Y, X = get_x_y(tweets_and_labels)
 
 #splitting training and test set
-x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.25, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
 #C = regularization parameter (keeps from overfitting): C is the degree of penalty (L1 or L2) (powers of 10)
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
@@ -128,8 +127,9 @@ fs = SelectFwe(alpha=275.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
-clf = svm.LinearSVC(C=100, penalty = 'l1', dual=False)
+clf = svm.LinearSVC(C=1000, penalty = 'l1', dual=False)
 clf.fit(x_train, y_train)
+#print dv.get_feature_names()
 
 print "Training Accuracy"
 print (classification_report(y_train, clf.predict(x_train)))
