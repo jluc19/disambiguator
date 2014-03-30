@@ -25,6 +25,8 @@ def parse_labeled_data(filename):
 	tweet = ''
 	label = ''
 	for line in file_content:
+		if line.startswith('###'):
+			continue
 		line = line.rstrip('\n')
 		if i % 2 == 1:
 			tweet = line
@@ -113,7 +115,7 @@ def get_ngram_frequencies(tweets_and_labels, n=1):
 # 1. Open labeled data, parse into tuples
 n = 2
 # min_freq = 3
-filename = "../datatxt/parsed/labeled_tweets.txt"
+filename = "labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
 random.shuffle(tweets_and_labels)
 

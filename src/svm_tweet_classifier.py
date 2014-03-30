@@ -3,7 +3,7 @@
 
 import nltk
 import itertools
-
+from sklearn import svm, grid_search, datasets
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.cross_validation import train_test_split
@@ -85,11 +85,10 @@ def ngrams(iterable, n=1):
 	for idx in range(l):
 		if idx + n < l : yield iterable[idx:idx+n]
 
-
 #returns all n grams in toks
 def ngram_features(toks, n=1) : 
 	n_dict = {}
-	for i in range(1,n):
+	for i in range(1,n+1):
 		n_dict.update({str(w) : 1 for w in ngrams(toks,i)})
 	return n_dict
 
@@ -119,7 +118,7 @@ tweets_and_labels = parse_labeled_data(filename)
 Y, X = get_x_y(tweets_and_labels)
 
 #splitting training and test set
-x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.25, random_state=42)
 
 #C = regularization parameter (keeps from overfitting): C is the degree of penalty (L1 or L2) (powers of 10)
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
@@ -129,11 +128,11 @@ fs = SelectFwe(alpha=275.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
-clf = svm.LinearSVC(C=.01, penalty = 'l2', dual=False)
+clf = svm.LinearSVC(C=100, penalty = 'l1', dual=False)
 clf.fit(x_train, y_train)
+
 print "Training Accuracy"
 print (classification_report(y_train, clf.predict(x_train)))
-
 x_test = fs.transform(x_test)
 
 print "Testing Accuracy"
