@@ -38,6 +38,7 @@ def parse_labeled_data(filename):
 		if line.startswith('###'):
 			continue
 		removeNonAscii(line)
+		print line
 		line = line.rstrip('\n')
 		if i % 2 == 1:
 			tweet = line
@@ -60,18 +61,22 @@ def parse_labeled_data(filename):
 	print 'we got ' + str(len(threes)) + ' tweets labeled with a 3'
 	smallest = min([len(l) for l in [ones, twos, threes]])
 	print 'smallest list is of size' + str(smallest)
-	random.shuffle(ones)
-	random.shuffle(twos)
-	random.shuffle(threes)
+	#random.shuffle(ones)
+	#random.shuffle(twos)
+	#random.shuffle(threes)
 	ones = ones[:smallest]
 	twos = twos[:smallest]
 	threes = threes[:smallest]
-	#tweets_and_labels = [] we were GOD DAMN MISSING THIS LINE
+	tweets_and_labels = [] #we were GOD DAMN MISSING THIS LINE
 	tweets_and_labels.extend(ones)
 	tweets_and_labels.extend(twos)
 	tweets_and_labels.extend(threes)
-	random.shuffle(tweets_and_labels)
+	print "ARRAY LENGTH", len(tweets_and_labels)
+	#random.shuffle(tweets_and_labels)
 	return tweets_and_labels
+
+
+	#THIS CODE NEEDS TO BE CLEANED UP
 
 def normalize(tweet): 
 	# get rid of certain punctuation chars
@@ -112,6 +117,7 @@ def get_x_y(data):
 	#print data
 	Y = le.transform([d[1] for d in data])
 	X = get_features([d[0] for d in data])
+	print "Y, X SIZE", len(Y)
 	return Y, X
 
 def print_top_features(vectorizer, clf, class_labels):
@@ -136,11 +142,11 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
 #TODO: separate into train test eval
 
-fs = SelectFwe(alpha=500.0)
+fs = SelectFwe(alpha=140.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
-clf = svm.LinearSVC(C=10, penalty = 'l1', dual=False)
+clf = svm.LinearSVC(C=10, penalty = 'l2', dual=False)
 clf.fit(x_train, y_train)
 
 print_top_features(dv, clf, target_names)
