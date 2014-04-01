@@ -2,6 +2,7 @@
 #Boyang Zhang and Jason Lucibello
 
 import nltk
+import numpy as np
 import itertools
 from sklearn import svm, grid_search, datasets
 from sklearn.preprocessing import LabelEncoder
@@ -12,7 +13,8 @@ from sklearn import svm
 import random
 from sklearn.feature_selection import SelectFwe
 
-sentiments = [1, 2, 3]
+sentiments = [1 ,2, 3]
+target_names = ["Self", "Another Person", "General Statement"]
 dv = DictVectorizer()
 le = LabelEncoder()
 
@@ -109,6 +111,14 @@ def get_x_y(data):
 	X = get_features([d[0] for d in data])
 	return Y, X
 
+def print_top_features(vectorizer, clf, class_labels):
+    """Prints features with the highest coefficient values, per class"""
+    feature_names = vectorizer.get_feature_names()
+    for i, class_label in enumerate(class_labels):
+        top20 = np.argsort(clf.coef_[i])[-20:]
+        print("%s: %s" % (class_label, " ".join(feature_names[j] for j in top20)))
+        print("\n")
+
 #random.shuffle
 
 filename = "new_labeled_tweets.txt"
@@ -123,17 +133,20 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
 #TODO: separate into train test eval
 
-fs = SelectFwe(alpha=275.0)
+fs = SelectFwe(alpha=350.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
-clf = svm.LinearSVC(C=1000, penalty = 'l1', dual=False)
+clf = svm.LinearSVC(C=1000, penalty = 'l2', dual=False)
 clf.fit(x_train, y_train)
-#print dv.get_feature_names()
+
+print_top_features(dv, clf, target_names)
 
 print "Training Accuracy"
-print (classification_report(y_train, clf.predict(x_train)))
+print (classification_report(y_train, clf.predict(x_train), target_names=target_names))
 x_test = fs.transform(x_test)
 
 print "Testing Accuracy"
-print (classification_report(y_test, clf.predict(x_test)))
+print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
+
+
