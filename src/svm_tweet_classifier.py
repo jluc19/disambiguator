@@ -66,7 +66,7 @@ def parse_labeled_data(filename):
 	ones = ones[:smallest]
 	twos = twos[:smallest]
 	threes = threes[:smallest]
-	tweets_and_labels = []
+	#tweets_and_labels = [] we were GOD DAMN MISSING THIS LINE
 	tweets_and_labels.extend(ones)
 	tweets_and_labels.extend(twos)
 	tweets_and_labels.extend(threes)
@@ -124,7 +124,7 @@ def print_top_features(vectorizer, clf, class_labels):
 
 #random.shuffle
 
-filename = "labeled_tweets.txt"
+filename = "new_labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
 #random.shuffle(tweets_and_labels)
 Y, X = get_x_y(tweets_and_labels)
@@ -136,11 +136,11 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
 #TODO: separate into train test eval
 
-fs = SelectFwe(alpha=700.0)
+fs = SelectFwe(alpha=500.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
-clf = svm.LinearSVC(C=1000, penalty = 'l2', dual=False)
+clf = svm.LinearSVC(C=10, penalty = 'l1', dual=False)
 clf.fit(x_train, y_train)
 
 print_top_features(dv, clf, target_names)
