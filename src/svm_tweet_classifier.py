@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #Tweet classifier using SVM
 #Boyang Zhang and Jason Lucibello
 
@@ -18,6 +19,7 @@ target_names = ["Self", "Another Person", "General Statement"]
 dv = DictVectorizer()
 le = LabelEncoder()
 
+def removeNonAscii(s): return "".join(i for i in s if ord(i)<128)
 def parse_labeled_data(filename):
 
 	f = open(filename, 'r')
@@ -35,6 +37,7 @@ def parse_labeled_data(filename):
 	for line in file_content:
 		if line.startswith('###'):
 			continue
+		removeNonAscii(line)
 		line = line.rstrip('\n')
 		if i % 2 == 1:
 			tweet = line
@@ -63,6 +66,7 @@ def parse_labeled_data(filename):
 	ones = ones[:smallest]
 	twos = twos[:smallest]
 	threes = threes[:smallest]
+	tweets_and_labels = []
 	tweets_and_labels.extend(ones)
 	tweets_and_labels.extend(twos)
 	tweets_and_labels.extend(threes)
@@ -100,7 +104,6 @@ def get_features(data) :
 		toks = normalize(tweet)
 		tweet_feat = ngram_features(toks, 2)
 		feat.append(tweet_feat)
-
 	feats = dv.fit_transform(feat)
 	return feats
 
@@ -121,19 +124,19 @@ def print_top_features(vectorizer, clf, class_labels):
 
 #random.shuffle
 
-filename = "new_labeled_tweets.txt"
+filename = "labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
 #random.shuffle(tweets_and_labels)
 Y, X = get_x_y(tweets_and_labels)
 
 #splitting training and test set
-x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
 
 #C = regularization parameter (keeps from overfitting): C is the degree of penalty (L1 or L2) (powers of 10)
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
 #TODO: separate into train test eval
 
-fs = SelectFwe(alpha=350.0)
+fs = SelectFwe(alpha=700.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
