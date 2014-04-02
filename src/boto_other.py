@@ -11,7 +11,7 @@ def reformat_tweets():
 		i = 0
 		if line.startswith("###") or line is "\n":
 			continue
-		print i, line
+		#print i, line
 		if i % 2 == 1:
 			line = re.sub('@[^\s]+','USER',line)
 			line = re.sub('[\s]+', ' ', line)

@@ -38,7 +38,7 @@ def parse_labeled_data(filename):
 		if line.startswith('###'):
 			continue
 		removeNonAscii(line)
-		print line
+		#print line
 		line = line.rstrip('\n')
 		if i % 2 == 1:
 			tweet = line
@@ -61,9 +61,9 @@ def parse_labeled_data(filename):
 	print 'we got ' + str(len(threes)) + ' tweets labeled with a 3'
 	smallest = min([len(l) for l in [ones, twos, threes]])
 	print 'smallest list is of size' + str(smallest)
-	#random.shuffle(ones)
-	#random.shuffle(twos)
-	#random.shuffle(threes)
+	random.shuffle(ones)
+	random.shuffle(twos)
+	random.shuffle(threes)
 	ones = ones[:smallest]
 	twos = twos[:smallest]
 	threes = threes[:smallest]
@@ -72,7 +72,7 @@ def parse_labeled_data(filename):
 	tweets_and_labels.extend(twos)
 	tweets_and_labels.extend(threes)
 	print "ARRAY LENGTH", len(tweets_and_labels)
-	#random.shuffle(tweets_and_labels)
+	random.shuffle(tweets_and_labels)
 	return tweets_and_labels
 
 
