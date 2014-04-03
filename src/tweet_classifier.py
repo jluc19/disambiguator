@@ -25,6 +25,8 @@ def parse_labeled_data(filename):
 	tweet = ''
 	label = ''
 	for line in file_content:
+		if line.startswith('###'):
+			continue
 		line = line.rstrip('\n')
 		if i % 2 == 1:
 			tweet = line
@@ -57,12 +59,16 @@ def split_feature_set(tweets):
 
 # Given a tweet / string, returns a list of words
 def tokenize_tweet(tweet):
+	# get rid of certain punctuation chars
+	symbols_to_eliminate = ['.', '-', ',']
+	for symbol in symbols_to_eliminate:
+		tweet.replace(symbol, '')
+
 	tokens = nltk.word_tokenize(tweet)
 
 	# only take words - things with letters ONLY 
 	words = [w for w in tokens if w.isalpha()]
-	# only take english words
-	# words = [w for w in words if not w in stopwords.words('english')]
+
 	# only take USEFUL words
 	words = [w for w in words if not w in custom_stopwords]
 
@@ -72,7 +78,7 @@ def tokenize_tweet(tweet):
 # 	if n = 3, will return unigrams, bigrams and trigrams
 #	INPUT  : 1 tweet (string)
 # 	OUTPUT : dictionary. key = gram, value = True
-def ngrams_features(tweet, frequency_dictionary, n=1, min_freq=3):
+def ngrams_features(tweet, frequency_dictionary, n=1, min_freq=6):
 	gram_features = {}
 	tweet_as_tokens = tokenize_tweet(tweet)
 	for i in range(n):
@@ -109,7 +115,7 @@ def get_ngram_frequencies(tweets_and_labels, n=1):
 # 1. Open labeled data, parse into tuples
 n = 2
 # min_freq = 3
-filename = "../datatxt/parsed/labeled_tweets.txt"
+filename = "labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
 random.shuffle(tweets_and_labels)
 
@@ -149,23 +155,23 @@ test_accuracy = nltk.classify.accuracy(classifier, test)
 print 'train accuracy:' + str(train_accuracy)
 print 'test accuracy: ' + str(test_accuracy)
 
-fname1 = "../datatxt/unparsed_tweets_scraped.csv"
-f1 = open(fname1, 'r')
-content = f1.readlines()
-fname2 = "../datatxt/classified_tweets_1_2"
-f2 = open(fname2, 'w')
-for line in content:
-	tweet = line.lower()
-	tweet_tok = tokenize_tweet(tweet)
-	feat = ngrams_features(line, frequency_dictionary, n)
-	prediction = classifier.classify(feat)
-	#prob = classifier.prob_classify(feat)
-	#p = prob.prob(prediction)
-	if prediction == 1 or prediction == 2:
-		f2.write(line)
-	#f2.write(str(prediction)+'\n')
-	#f2.write(str(p)+'\n')
+# fname1 = "../datatxt/unparsed_tweets_scraped.csv"
+# f1 = open(fname1, 'r')
+# content = f1.readlines()
+# fname2 = "../datatxt/classified_tweets_1_2"
+# f2 = open(fname2, 'w')
+# for line in content:
+# 	tweet = line.lower()
+# 	tweet_tok = tokenize_tweet(tweet)
+# 	feat = ngrams_features(line, frequency_dictionary, n)
+# 	prediction = classifier.classify(feat)
+# 	#prob = classifier.prob_classify(feat)
+# 	#p = prob.prob(prediction)
+# 	if prediction == 1 or prediction == 2:
+# 		f2.write(line)
+# 	#f2.write(str(prediction)+'\n')
+# 	#f2.write(str(p)+'\n')
 
-f1.close()
-f2.close()
+# f1.close()
+# f2.close()
 print "Classifying completed"

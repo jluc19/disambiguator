@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import langid, random, csv, re
 from boto.mturk.connection import MTurkConnection
 from boto.mturk.question import QuestionContent,Question,QuestionForm,Overview,AnswerSpecification,SelectionAnswer,FormattedContent,FreeTextAnswer
@@ -11,8 +12,9 @@ mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
                       host=HOST)
 
 def format_tweets():
-	f = open('unparsed_tweets_scraped.csv', 'r')
+	f = open('../datatxt	/raw/all_tweets.txt', 'r')
 	w = open('parsed_tweets_scraped.csv', 'w')
+	l = open('parsed_tweets_scraped_links.csv', 'w')
 	while 1:
 		file_content = f.readlines(10000)
 		if not file_content:
@@ -30,9 +32,13 @@ def format_tweets():
 					if not line.startswith("\"RT"):
 						if not "http" in line and not "https" in line:
 							w.write(line + "\n")
+						else:
+							line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
+							l.write(line + "\n")
 	f.close()
 	w.close()
-	w = open('parsed_tweets_scraped.csv', 'r')
+	l.close()
+	w = open('parsed_tweets_scraped_links.csv', 'r')
 	print w.readlines()
 	w.close()
 
