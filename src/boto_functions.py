@@ -11,14 +11,24 @@ mtc = MTurkConnection(aws_access_key_id=ACCESS_ID,
                       aws_secret_access_key=SECRET_KEY,
                       host=HOST)
 
+def process_file_content(file_content):
+	ret = []
+	for line in file_content:
+		line = re.sub('@[^\s]+','USER',line)
+		line = re.sub('[\s]+', ' ', line)
+		line = re.sub(r'#([^\s]+)', r'\1', line)
+		ret.append(line)
+	return ret
+
 def format_tweets():
-	f = open('../datatxt	/raw/all_tweets.txt', 'r')
-	w = open('parsed_tweets_scraped.csv', 'w')
-	l = open('parsed_tweets_scraped_links.csv', 'w')
+	f = open('../datatxt/raw/all_tweets.txt', 'r')
+	w = open('parsed_tweets_scraped1.csv', 'w')
+	l = open('parsed_tweets_scraped_links1.csv', 'w')
 	while 1:
 		file_content = f.readlines(10000)
 		if not file_content:
 			break
+		file_content = process_file_content(file_content)
 		non_dup = list(set(file_content))
 		for line in non_dup:
 			tup = langid.classify(line)

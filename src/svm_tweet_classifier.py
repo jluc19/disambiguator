@@ -21,62 +21,53 @@ le = LabelEncoder()
 
 def removeNonAscii(s): return "".join(i for i in s if ord(i)<128)
 def parse_labeled_data(filename):
-
-	f = open(filename, 'r')
-	file_content = f.readlines()
-
+	#variable setup
+	ones, twos, threes, tweets_and_labels = ([] for i in range(4))
+	tweet, label = '', ''
 	i = 1
 
-	ones = []
-	twos = []
-	threes = []
+	with open(filename, 'r') as f:
+		for line in f:
+			if line.startswith('###'):
+				continue
+			line = line.rstrip('\n')
+			removeNonAscii(line)
+			#print line
+			if i % 2 == 1:
+				tweet = line
+			else:
+				l = int(line)
+				if l == 1:
+					ones.append((tweet, l))
+				elif l == 2:
+					twos.append((tweet, l))
+				else:
+					threes.append((tweet, 3))
+			i = i + 1
 
-	tweets_and_labels = []
-	tweet = ''
-	label = ''
-	for line in file_content:
-		if line.startswith('###'):
-			continue
-		removeNonAscii(line)
-		#print line
-		line = line.rstrip('\n')
-		if i % 2 == 1:
-			tweet = line
-		else:
-			label = line
-			l = int(label)
-			elem = (tweet, l)
-			if l == 1:
-				tweets_and_labels.append(elem)
-				ones.append(elem)
-			elif l == 2:
-				tweets_and_labels.append(elem)
-				twos.append(elem)
-			elif (l == 3 or l == 4):
-				elem = (tweet, 3)
-				threes.append(elem)
-		i = i + 1
-	print 'we got ' + str(len(ones)) + ' tweets labeled with a 1'
-	print 'we got ' + str(len(twos)) + ' tweets labeled with a 2'
-	print 'we got ' + str(len(threes)) + ' tweets labeled with a 3'
 	smallest = min([len(l) for l in [ones, twos, threes]])
+	print 'we have ' + str(len(ones)) + ' tweets labeled with a 1'
+	print 'we have ' + str(len(twos)) + ' tweets labeled with a 2'
+	print 'we have ' + str(len(threes)) + ' tweets labeled with a 3'
 	print 'smallest list is of size' + str(smallest)
+
+	#shuffling
 	random.shuffle(ones)
 	random.shuffle(twos)
 	random.shuffle(threes)
+
+	#trimming
 	ones = ones[:smallest]
 	twos = twos[:smallest]
 	threes = threes[:smallest]
-	tweets_and_labels = [] #we were GOD DAMN MISSING THIS LINE
+
+	#concatenating
 	tweets_and_labels.extend(ones)
 	tweets_and_labels.extend(twos)
 	tweets_and_labels.extend(threes)
-	print "ARRAY LENGTH", len(tweets_and_labels)
+
 	random.shuffle(tweets_and_labels)
 	return tweets_and_labels
-
-
-	#THIS CODE NEEDS TO BE CLEANED UP
 
 def normalize(tweet): 
 	# get rid of certain punctuation chars
@@ -86,8 +77,8 @@ def normalize(tweet):
 
 	toks = nltk.word_tokenize(tweet)
 
-	# only take words - things with letters ONLY 
-	# toks = [w for w in toks if w.isalpha()]
+	# only take words - things with lowercase letters 
+	toks = [w.lower() for w in toks]
 
 	return toks
 
@@ -114,7 +105,7 @@ def get_features(data) :
 
 def get_x_y(data):
 	le.fit(sentiments)
-	#print data
+	print data
 	Y = le.transform([d[1] for d in data])
 	X = get_features([d[0] for d in data])
 	print "Y, X SIZE", len(Y)
@@ -128,8 +119,6 @@ def print_top_features(vectorizer, clf, class_labels):
         print("%s: %s" % (class_label, " ".join(feature_names[j] for j in top20)))
         print("\n")
 
-#random.shuffle
-
 filename = "new_labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
 #random.shuffle(tweets_and_labels)
@@ -142,11 +131,11 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
 #TODO: separate into train test eval
 
-fs = SelectFwe(alpha=140.0)
+fs = SelectFwe(alpha=300.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
-clf = svm.LinearSVC(C=10, penalty = 'l2', dual=False)
+clf = svm.LinearSVC(C=1000, penalty = 'l2', dual=False)
 clf.fit(x_train, y_train)
 
 print_top_features(dv, clf, target_names)
