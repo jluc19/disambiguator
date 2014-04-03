@@ -22,8 +22,8 @@ def process_file_content(file_content):
 
 def format_tweets():
 	f = open('../datatxt/raw/all_tweets.txt', 'r')
-	w = open('parsed_tweets_scraped1.csv', 'w')
-	l = open('parsed_tweets_scraped_links1.csv', 'w')
+	w = open('parsed_tweets_scraped.csv', 'w')
+	l = open('parsed_tweets_scraped_links.csv', 'w')
 	while 1:
 		file_content = f.readlines(10000)
 		if not file_content:

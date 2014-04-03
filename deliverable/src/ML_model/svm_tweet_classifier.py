@@ -105,7 +105,7 @@ def get_features(data) :
 
 def get_x_y(data):
 	le.fit(sentiments)
-	print data
+	#print data
 	Y = le.transform([d[1] for d in data])
 	X = get_features([d[0] for d in data])
 	print "Y, X SIZE", len(Y)
@@ -119,7 +119,7 @@ def print_top_features(vectorizer, clf, class_labels):
         print("%s: %s" % (class_label, " ".join(feature_names[j] for j in top20)))
         print("\n")
 
-filename = "new_labeled_tweets.txt"
+filename = "../training_data/new_labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
 #random.shuffle(tweets_and_labels)
 Y, X = get_x_y(tweets_and_labels)
