@@ -131,7 +131,7 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
 #TODO: separate into train test eval
 
-fs = SelectFwe(alpha=300.0)
+fs = SelectFwe(alpha=165.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
