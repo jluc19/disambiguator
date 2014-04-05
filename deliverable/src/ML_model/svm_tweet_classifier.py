@@ -11,7 +11,7 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import classification_report
 from sklearn import svm
-import random
+import random, re, collections
 from sklearn.feature_selection import SelectFwe
 
 sentiments = [1 ,2, 3]
@@ -26,7 +26,8 @@ def parse_labeled_data(filename):
 	ones, twos, threes, tweets_and_labels = ([] for i in range(4))
 	tweet, label = '', ''
 	i = 1
-
+	newFile = open('../training_data/ordered_tweets.txt', 'w')
+	dup = open('duplicates.txt', 'w')
 	with open(filename, 'r') as f:
 		for line in f:
 			if line.startswith('###'):
@@ -35,6 +36,10 @@ def parse_labeled_data(filename):
 			removeNonAscii(line)
 			#print line
 			if i % 2 == 1:
+				line = re.sub('@[^\s]+','USER',line)
+				line = re.sub('[\s]+', ' ', line)
+				line = re.sub(r'#([^\s]+)', r'\1', line)
+				line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
 				tweet = line
 			else:
 				l = int(line)
@@ -46,10 +51,29 @@ def parse_labeled_data(filename):
 					threes.append((tweet, 3))
 			i = i + 1
 
+
+	duplicates = []
+	duplicates.extend(ones)
+	duplicates.extend(twos)
+	duplicates.extend(threes)
+
+	dup.write(str([x for x, y in collections.Counter(duplicates).items() if y > 50]))
+
 	#remove duplicates
 	ones = list(set(ones))
 	twos = list(set(twos))
 	threes = list(set(threes))
+
+	for item, val in ones:
+		newFile.write(item + "\n")
+		newFile.write(str(val) + "\n")
+	for item, val in twos:
+		newFile.write(item + "\n")
+		newFile.write(str(val) + "\n")
+	for item, val in threes:
+		newFile.write(item + "\n")
+		newFile.write(str(val) + "\n")
+	newFile.close()
 
 	smallest = min([len(l) for l in [ones, twos, threes]])
 	print 'we have ' + str(len(ones)) + ' tweets labeled with a 1'
@@ -125,7 +149,7 @@ def print_top_features(vectorizer, clf, class_labels):
         print("%s: %s" % (class_label, " ".join(feature_names[j] for j in top20)))
         print("\n")
 
-filename = "../training_data/new_labeled_tweets.txt"
+filename = "../training_data/labeled_tweets.txt"
 tweets_and_labels = parse_labeled_data(filename)
 #random.shuffle(tweets_and_labels)
 Y, X = get_x_y(tweets_and_labels)
