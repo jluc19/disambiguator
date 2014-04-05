@@ -20,6 +20,7 @@ dv = DictVectorizer()
 le = LabelEncoder()
 
 def removeNonAscii(s): return "".join(i for i in s if ord(i)<128)
+
 def parse_labeled_data(filename):
 	#variable setup
 	ones, twos, threes, tweets_and_labels = ([] for i in range(4))
@@ -44,6 +45,11 @@ def parse_labeled_data(filename):
 				else:
 					threes.append((tweet, 3))
 			i = i + 1
+
+	#remove duplicates
+	ones = list(set(ones))
+	twos = list(set(twos))
+	threes = list(set(threes))
 
 	smallest = min([len(l) for l in [ones, twos, threes]])
 	print 'we have ' + str(len(ones)) + ' tweets labeled with a 1'
