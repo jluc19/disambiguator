@@ -33,11 +33,11 @@ def parse_labeled_data(filename):
 			if line.startswith('###'):
 				continue
 			line = line.rstrip('\n')
-			removeNonAscii(line)
+			#removeNonAscii(line)
 			#print line
 			if i % 2 == 1:
 				line = re.sub('@[^\s]+','USER',line)
-				line = re.sub('[\s]+', ' ', line)
+				#line = re.sub('[\s]+', ' ', line)
 				line = re.sub(r'#([^\s]+)', r'\1', line)
 				line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
 				tweet = line
@@ -57,7 +57,7 @@ def parse_labeled_data(filename):
 	duplicates.extend(twos)
 	duplicates.extend(threes)
 
-	dup.write(str([x for x, y in collections.Counter(duplicates).items() if y > 50]))
+	dup.write(str([x for x, y in collections.Counter(duplicates).items() if y > 1]))
 
 	#remove duplicates
 	ones = list(set(ones))
@@ -82,9 +82,9 @@ def parse_labeled_data(filename):
 	print 'smallest list is of size' + str(smallest)
 
 	#shuffling
-	random.shuffle(ones)
-	random.shuffle(twos)
-	random.shuffle(threes)
+	#random.shuffle(ones)
+	#random.shuffle(twos)
+	#random.shuffle(threes)
 
 	#trimming
 	ones = ones[:smallest]
@@ -96,7 +96,7 @@ def parse_labeled_data(filename):
 	tweets_and_labels.extend(twos)
 	tweets_and_labels.extend(threes)
 
-	random.shuffle(tweets_and_labels)
+	#random.shuffle(tweets_and_labels)
 	return tweets_and_labels
 
 def normalize(tweet): 
@@ -149,7 +149,7 @@ def print_top_features(vectorizer, clf, class_labels):
         print("%s: %s" % (class_label, " ".join(feature_names[j] for j in top20)))
         print("\n")
 
-filename = "../training_data/labeled_tweets.txt"
+filename = "../training_data/ordered_tweets_no_duplicates.txt"
 tweets_and_labels = parse_labeled_data(filename)
 #random.shuffle(tweets_and_labels)
 Y, X = get_x_y(tweets_and_labels)
@@ -161,11 +161,11 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
 #TODO: separate into train test eval
 
-fs = SelectFwe(alpha=165.0)
+fs = SelectFwe(alpha=105.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
-clf = svm.LinearSVC(C=1000, penalty = 'l2', dual=False)
+clf = svm.LinearSVC(C=100, penalty = 'l2', dual=False)
 clf.fit(x_train, y_train)
 
 print_top_features(dv, clf, target_names)
