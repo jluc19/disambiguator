@@ -4,15 +4,13 @@
 
 import nltk
 import numpy as np
-import itertools
 from sklearn import svm, grid_search, datasets
 from sklearn.preprocessing import LabelEncoder
+from sklearn.feature_selection import SelectFwe
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import classification_report
-from sklearn import svm
-import random, re, collections
-from sklearn.feature_selection import SelectFwe
+import random, re, collections, itertools
 
 sentiments = [1 ,2, 3]
 target_names = ["Self", "Another Person", "General Statement"]
@@ -37,9 +35,9 @@ def parse_labeled_data(filename):
 			#print line
 			if i % 2 == 1:
 				line = re.sub('@[^\s]+','USER',line)
-				#line = re.sub('[\s]+', ' ', line)
+				line = re.sub("^\s+","", line)
 				line = re.sub(r'#([^\s]+)', r'\1', line)
-				line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
+				#line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
 				tweet = line
 			else:
 				l = int(line)
@@ -128,6 +126,7 @@ def get_features(data) :
 	feat = []
 	for tweet in data:
 		toks = normalize(tweet)
+		#print toks
 		tweet_feat = ngram_features(toks, 2)
 		feat.append(tweet_feat)
 	feats = dv.fit_transform(feat)
@@ -161,7 +160,7 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
 #TODO: separate into train test eval
 
-fs = SelectFwe(alpha=105.0)
+fs = SelectFwe(alpha=205.0)
 print "Before", x_train.shape
 x_train = fs.fit_transform(x_train, y_train)
 print "After", x_train.shape
