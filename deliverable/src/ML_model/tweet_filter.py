@@ -41,7 +41,7 @@ def filter_tweets(input_data, ml_model):
 	labels = ml_model.predict(t)
 	user_labels = {}
 
-	for i in range(len(labels))
+	for i in range(len(labels)):
 		user = users[i]
 		label = labels[i]
 
