@@ -4,12 +4,19 @@
 
 import nltk
 import numpy as np
+from numpy import exp,arange
 from sklearn import svm, grid_search, datasets
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_selection import SelectFwe
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import classification_report
+
+from pylab import meshgrid,cm,imshow,contour,clabel,colorbar,axis,title,show
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import axes3d, Axes3D
+from matplotlib import cm, mlab
+
 import random, re, collections, itertools
 
 sentiments = [1 ,2, 3]
@@ -137,7 +144,7 @@ def get_x_y(data):
 	#print data
 	Y = le.transform([d[1] for d in data])
 	X = get_features([d[0] for d in data])
-	print "Y, X SIZE", len(Y)
+	#print "Y, X SIZE", len(Y)
 	return Y, X
 
 def print_top_features(vectorizer, clf, class_labels):
@@ -160,20 +167,94 @@ x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random
 #penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
 #TODO: separate into train test eval
 
-fs = SelectFwe(alpha=205.0)
+fs = SelectFwe(alpha=150.0)
+
 print "Before", x_train.shape
-x_train = fs.fit_transform(x_train, y_train)
-print "After", x_train.shape
-clf = svm.LinearSVC(C=100, penalty = 'l2', dual=False)
+
+clf = svm.LinearSVC(C=100, penalty='l2', dual = False)
 clf.fit(x_train, y_train)
 
-print_top_features(dv, clf, target_names)
+
+
+
+print "NO FEATURE SELECTION"
+print "Training Accuracy"
+#print clf.decision_function(x_train)
+print (classification_report(y_train, clf.predict(x_train), target_names=target_names))
+print "Testing Accuracy"
+print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
+
+
+
+
+
+x_train = fs.fit_transform(x_train, y_train)
+clf.fit(x_train, y_train)
+
+print "After", x_train.shape
+
+
+
+
 
 print "Training Accuracy"
 print (classification_report(y_train, clf.predict(x_train), target_names=target_names))
 x_test = fs.transform(x_test)
-
 print "Testing Accuracy"
 print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
+
+
+
+print_top_features(dv, clf, target_names)
+
+
+
+
+
+decisions = clf.decision_function(x_test)
+X = np.array(decisions[:,0]) #Self
+Y = np.array(decisions[:,1]) #Other Person
+Z = np.array(decisions[:,2]) #General Statements
+points = []
+for i, val in enumerate(X):
+	points.append((X[i], Y[i], Z[i]))
+points = list(set(points))
+new_y = []
+for i, val in enumerate(y_test):
+	if val == 0:
+		val = 'b'
+		mark = 'o'
+	elif val == 1:
+		val = 'r'
+		mark = '+'
+	else:
+		val = 'g'
+		mark = '^'
+	new_y.append((val, mark))
+
+#3-D Plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+for i, val in enumerate(np.array(X)):
+	ax.scatter3D(X[i], Y[i], Z[i], c=new_y[i][0], marker=new_y[i][1])
+
+ax.set_xlabel('Self')
+ax.set_ylabel('Another Person')
+ax.set_zlabel('General Disease')
+ax.set_autoscale_on(True)
+plt.show()
+
+#2-D Plot
+fig2 = plt.figure()
+ax2 = fig2.add_subplot(111)
+for i, val in enumerate(np.array(X)):
+	if new_y[i][0] != 'g': 
+		ax2.scatter(X[i], Y[i], c=new_y[i][0], marker=new_y[i][1])
+ax2.set_xlabel('Self')
+ax2.set_ylabel('Another Person')
+ax2.set_autoscale_on(True)
+plt.show()
+
+
 
 
