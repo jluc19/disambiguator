@@ -148,57 +148,48 @@ def print_top_features(vectorizer, clf, class_labels):
         print("%s: %s" % (class_label, " ".join(feature_names[j] for j in top20)))
         print("\n")
 
+def test_data_parse():
+	print 0
+	#TODO do parsing of unlabeled tweets here for testing
+
+
+def test_get_x():
+	print 0
+	#TODO get X sparse matrix of unlabeled tweets here for testing
+
 def run():
 	filename = "../training_data/ordered_tweets_no_duplicates.txt"
+	
 	tweets_and_labels = parse_labeled_data(filename)
+
 	#random.shuffle(tweets_and_labels)
+	#TODO: change Y and X to Y_train and X_train
 	Y, X = get_x_y(tweets_and_labels)
 
-	#splitting training and test set
-	x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
+	'''
+	testfile = "test.txt"
+	test_tweets = test_data_parse(testfile)
+	x_test = test_get_x(test_tweets)
+	
+	'''
 
-	#C = regularization parameter (keeps from overfitting): C is the degree of penalty (L1 or L2) (powers of 10)
-	#penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
-	#TODO: separate into train test eval
+	#splitting training and test set
+	#TODO this line should be deleted
+	x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
 
 	fs = SelectFwe(alpha=205.0)
 	print "Before", x_train.shape
 	x_train = fs.fit_transform(x_train, y_train)
 	print "After", x_train.shape
 	clf = svm.LinearSVC(C=100, penalty = 'l2', dual=False)
+	clf.fit(x_train, y_train)
 
+	print_top_features(dv, clf, target_names)
 
-# STUFF
-# STUFF
-# STUFF
-# STUFF
-# STUFF
-filename = "../training_data/ordered_tweets_no_duplicates.txt"
-tweets_and_labels = parse_labeled_data(filename)
-#random.shuffle(tweets_and_labels)
-Y, X = get_x_y(tweets_and_labels)
+	x_test = fs.transform(x_test)
+	
+	print clf.predict(x_test)
+	print clf.decision_function(x_test)
 
-#splitting training and test set
-x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
-
-#C = regularization parameter (keeps from overfitting): C is the degree of penalty (L1 or L2) (powers of 10)
-#penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
-#TODO: separate into train test eval
-
-fs = SelectFwe(alpha=205.0)
-print "Before", x_train.shape
-x_train = fs.fit_transform(x_train, y_train)
-print "After", x_train.shape
-clf = svm.LinearSVC(C=100, penalty = 'l2', dual=False)
-clf.fit(x_train, y_train)
-
-print_top_features(dv, clf, target_names)
-
-print "Training Accuracy"
-print (classification_report(y_train, clf.predict(x_train), target_names=target_names))
-x_test = fs.transform(x_test)
-
-print "Testing Accuracy"
-print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
-
+run()
 
