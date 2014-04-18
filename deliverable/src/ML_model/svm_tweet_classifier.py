@@ -6,6 +6,8 @@
 #and this: http://nbviewer.ipython.org/github/herrfz/parallel_ml_tutorial/blob/master/notebooks/03%20-%20Text%20Feature%20Extraction%20for%20Classification%20and%20Clustering.ipynb
 
 import nltk
+from nltk import word_tokenize          # doctest: +SKIP
+from nltk.stem import WordNetLemmatizer # doctest: +SKIP
 import numpy as np
 from itertools import cycle
 from numpy import exp,arange
@@ -27,12 +29,19 @@ from matplotlib import cm, mlab
 
 import random, re, collections, itertools
 
-print TfidfVectorizer(ngram_range=(1,2))
+print TfidfVectorizer()
 
+
+class LemmaTokenizer(object):
+	def __init__(self):
+		self.wnl = WordNetLemmatizer()
+	def __call__(self, doc):
+		return [self.wnl.lemmatize(t) for t in word_tokenize(doc)]
 
 sentiments = [1 ,2, 3]
 target_names = ["Self", "Another Person", "General Statement"]
-dv = TfidfVectorizer()
+
+dv = TfidfVectorizer(ngram_range=(1,2), min_df=0.005, max_df=0.3, tokenizer=LemmaTokenizer())
 le = LabelEncoder()
 
 def removeNonAscii(s): return "".join(i for i in s if ord(i)<128)
@@ -49,13 +58,13 @@ def parse_labeled_data(filename):
 			if line.startswith('###'):
 				continue
 			line = line.rstrip('\n')
-			#removeNonAscii(line)
+			removeNonAscii(line)
 			#print line
 			if i % 2 == 1:
-				line = re.sub('@[^\s]+','USER',line)
+				#line = re.sub('@[^\s]+','USER',line)
 				line = re.sub("^\s+","", line)
-				line = re.sub(r'#([^\s]+)', r'\1', line)
-				#line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
+				#line = re.sub(r'#([^\s]+)', r'\1', line)
+				line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
 				tweet = line
 			else:
 				l = int(line)
@@ -173,7 +182,7 @@ Y, X = get_x_y(tweets_and_labels)
 #splitting training and test set
 x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=1)
 
-fs = SelectFwe(alpha=700.0)
+fs = SelectFwe(alpha=400.0)
 
 print "Before", x_train.shape
 
@@ -211,7 +220,7 @@ print "Testing Accuracy"
 print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
 
 print_top_features(dv, clf, target_names)
-graph = True
+graph = False
 
 #print dv.get_feature_names()[:10]
 #print dv.get_feature_names()
