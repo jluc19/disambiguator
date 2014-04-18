@@ -2,15 +2,23 @@
 #Tweet classifier using SVM
 #Boyang Zhang and Jason Lucibello
 
+#Changes made based on this:https://www.youtube.com/watch?v=iFkRt3BCctg
+#and this: http://nbviewer.ipython.org/github/herrfz/parallel_ml_tutorial/blob/master/notebooks/03%20-%20Text%20Feature%20Extraction%20for%20Classification%20and%20Clustering.ipynb
+
 import nltk
 import numpy as np
+from itertools import cycle
 from numpy import exp,arange
 from sklearn import svm, grid_search, datasets
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_selection import SelectFwe
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.cross_validation import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cross_validation import train_test_split, ShuffleSplit, cross_val_score
 from sklearn.metrics import classification_report
+from sklearn.pipeline import FeatureUnion
+from sklearn.decomposition import PCA, RandomizedPCA
+from sklearn.decomposition import KernelPCA
 
 from pylab import meshgrid,cm,imshow,contour,clabel,colorbar,axis,title,show
 import matplotlib.pyplot as plt
@@ -19,9 +27,12 @@ from matplotlib import cm, mlab
 
 import random, re, collections, itertools
 
+print TfidfVectorizer(ngram_range=(1,2))
+
+
 sentiments = [1 ,2, 3]
 target_names = ["Self", "Another Person", "General Statement"]
-dv = DictVectorizer()
+dv = TfidfVectorizer()
 le = LabelEncoder()
 
 def removeNonAscii(s): return "".join(i for i in s if ord(i)<128)
@@ -132,16 +143,15 @@ def ngram_features(toks, n=1) :
 def get_features(data) :
 	feat = []
 	for tweet in data:
-		toks = normalize(tweet)
-		#print toks
-		tweet_feat = ngram_features(toks, 2)
-		feat.append(tweet_feat)
+		#toks = normalize(tweet)
+		#tweet_feat = ngram_features(toks, 2)
+		#feat.append(tweet_feat)
+		feat.append(tweet)
 	feats = dv.fit_transform(feat)
 	return feats
 
 def get_x_y(data):
 	le.fit(sentiments)
-	#print data
 	Y = le.transform([d[1] for d in data])
 	X = get_features([d[0] for d in data])
 	#print "Y, X SIZE", len(Y)
@@ -161,17 +171,14 @@ tweets_and_labels = parse_labeled_data(filename)
 Y, X = get_x_y(tweets_and_labels)
 
 #splitting training and test set
-x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=1)
 
-#C = regularization parameter (keeps from overfitting): C is the degree of penalty (L1 or L2) (powers of 10)
-#penalty sparse = l2 lowers angle so that no unigram can be super weighted, l1 removes features to shift the curve
-#TODO: separate into train test eval
-
-fs = SelectFwe(alpha=150.0)
+fs = SelectFwe(alpha=700.0)
 
 print "Before", x_train.shape
 
-clf = svm.LinearSVC(C=100, penalty='l2', dual = False)
+#clf=svm.SVC(kernel='rbf', C=1000, gamma=0.0001)
+clf = svm.LinearSVC(C=0.1, penalty='l2', loss="l1", dual=True, fit_intercept=True)
 clf.fit(x_train, y_train)
 
 
@@ -193,8 +200,8 @@ clf.fit(x_train, y_train)
 
 print "After", x_train.shape
 
-
-
+n_samples, n_features = x_train.shape
+print n_samples, n_features
 
 
 print "Training Accuracy"
@@ -203,57 +210,72 @@ x_test = fs.transform(x_test)
 print "Testing Accuracy"
 print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
 
-
-
 print_top_features(dv, clf, target_names)
+graph = True
+
+#print dv.get_feature_names()[:10]
+#print dv.get_feature_names()
+
+
+if(graph):
+	train_small_pca = RandomizedPCA(n_components=3,).fit_transform(x_train)
+
+	colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+	for i, c in zip(np.unique(y_train), cycle(colors)):
+	    plt.scatter(train_small_pca[y_train == i, 0],
+	               train_small_pca[y_train == i, 1],
+	               c=c, label=sentiments[i], alpha=0.5)
+	    
+	_ = plt.legend(loc='best')
+	plt.show()
 
 
 
 
+if(graph):
+	decisions = clf.decision_function(x_test)
+	X = np.array(decisions[:,0]) #Self
+	Y = np.array(decisions[:,1]) #Other Person
+	Z = np.array(decisions[:,2]) #General Statements
+	points = []
+	for i, val in enumerate(X):
+		points.append((X[i], Y[i], Z[i]))
+	points = list(set(points))
+	new_y = []
+	for i, val in enumerate(y_test):
+		if val == 0:
+			val = 'b'
+			mark = 'o'
+		elif val == 1:
+			val = 'r'
+			mark = '+'
+		else:
+			val = 'g'
+			mark = '^'
+		new_y.append((val, mark))
 
-decisions = clf.decision_function(x_test)
-X = np.array(decisions[:,0]) #Self
-Y = np.array(decisions[:,1]) #Other Person
-Z = np.array(decisions[:,2]) #General Statements
-points = []
-for i, val in enumerate(X):
-	points.append((X[i], Y[i], Z[i]))
-points = list(set(points))
-new_y = []
-for i, val in enumerate(y_test):
-	if val == 0:
-		val = 'b'
-		mark = 'o'
-	elif val == 1:
-		val = 'r'
-		mark = '+'
-	else:
-		val = 'g'
-		mark = '^'
-	new_y.append((val, mark))
+	#3-D Plot
+	fig = plt.figure()
+	ax = fig.add_subplot(111, projection='3d')
+	for i, val in enumerate(np.array(X)):
+		ax.scatter3D(X[i], Y[i], Z[i], c=new_y[i][0], marker=new_y[i][1])
 
-#3-D Plot
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-for i, val in enumerate(np.array(X)):
-	ax.scatter3D(X[i], Y[i], Z[i], c=new_y[i][0], marker=new_y[i][1])
+	ax.set_xlabel('Self')
+	ax.set_ylabel('Another Person')
+	ax.set_zlabel('General Disease')
+	ax.set_autoscale_on(True)
+	plt.show()
 
-ax.set_xlabel('Self')
-ax.set_ylabel('Another Person')
-ax.set_zlabel('General Disease')
-ax.set_autoscale_on(True)
-plt.show()
-
-#2-D Plot
-fig2 = plt.figure()
-ax2 = fig2.add_subplot(111)
-for i, val in enumerate(np.array(X)):
-	if new_y[i][0] != 'g': 
-		ax2.scatter(X[i], Y[i], c=new_y[i][0], marker=new_y[i][1])
-ax2.set_xlabel('Self')
-ax2.set_ylabel('Another Person')
-ax2.set_autoscale_on(True)
-plt.show()
+	#2-D Plot
+	fig2 = plt.figure()
+	ax2 = fig2.add_subplot(111)
+	for i, val in enumerate(np.array(X)):
+		if new_y[i][0] != 'g': 
+			ax2.scatter(X[i], Y[i], c=new_y[i][0], marker=new_y[i][1])
+	ax2.set_xlabel('Self')
+	ax2.set_ylabel('Another Person')
+	ax2.set_autoscale_on(True)
+	plt.show()
 
 
 
