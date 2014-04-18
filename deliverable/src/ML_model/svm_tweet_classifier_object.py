@@ -10,6 +10,7 @@ from sklearn.feature_selection import SelectFwe
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import classification_report
+from sklearn.feature_selection import SelectPercentile, chi2, f_classif
 import random, re, collections, itertools
 
 sentiments = [1 ,2, 3]
@@ -176,20 +177,31 @@ def run():
 	#splitting training and test set
 	#TODO this line should be deleted
 	x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
-
 	fs = SelectFwe(alpha=205.0)
 	print "Before", x_train.shape
 	x_train = fs.fit_transform(x_train, y_train)
 	print "After", x_train.shape
+
+	print "Univariate Feature Selection"
+	sel = SelectPercentile(chi2, percentile=80)
+	sel.fit(x_train, y_train)
+
+	
+	x_train = sel.transform(x_train)
+
 	clf = svm.LinearSVC(C=100, penalty = 'l2', dual=False)
 	clf.fit(x_train, y_train)
 
 	print_top_features(dv, clf, target_names)
 
 	x_test = fs.transform(x_test)
-	
-	print clf.predict(x_test)
-	print clf.decision_function(x_test)
+	x_test = sel.transform(x_test)
+	#print clf.predict(x_test)
+	#print clf.decision_function(x_test)
+	print "Training Accuracy"
+	print (classification_report(y_train, clf.predict(x_train), target_names=target_names))
+	print "Testing Accuracy"
+	print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
 
 run()
 
