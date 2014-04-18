@@ -19,6 +19,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cross_validation import train_test_split, ShuffleSplit, cross_val_score
 from sklearn.metrics import classification_report
 from sklearn.pipeline import FeatureUnion
+from sklearn.feature_selection import SelectPercentile, chi2, f_classif
 from sklearn.decomposition import PCA, RandomizedPCA
 from sklearn.decomposition import KernelPCA
 
@@ -186,6 +187,15 @@ fs = SelectFwe(alpha=400.0)
 
 print "Before", x_train.shape
 
+
+print "Univariate Feature Selection"
+sel = SelectPercentile(chi2, percentile=80)
+sel.fit(x_train, y_train)
+
+	
+x_train = sel.transform(x_train)
+x_test = sel.transform(x_test)
+
 #clf=svm.SVC(kernel='rbf', C=1000, gamma=0.0001)
 clf = svm.LinearSVC(C=0.1, penalty='l2', loss="l1", dual=True, fit_intercept=True)
 clf.fit(x_train, y_train)
@@ -219,8 +229,8 @@ x_test = fs.transform(x_test)
 print "Testing Accuracy"
 print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
 
-print_top_features(dv, clf, target_names)
-graph = False
+#print_top_features(dv, clf, target_names)
+graph = True
 
 #print dv.get_feature_names()[:10]
 #print dv.get_feature_names()
