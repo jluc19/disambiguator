@@ -19,7 +19,7 @@ def parse_labeled_data(filename):
 	one = 0
 	two = 0
 	three = 0
-	limit = 200
+	limit = 800
 
 	tweets_and_labels = []
 	tweet = ''
@@ -115,7 +115,7 @@ def get_ngram_frequencies(tweets_and_labels, n=1):
 # 1. Open labeled data, parse into tuples
 n = 2
 # min_freq = 3
-filename = "labeled_tweets.txt"
+filename = "../../deliverable/src/training_data/ordered_tweets_no_duplicates.txt"
 tweets_and_labels = parse_labeled_data(filename)
 random.shuffle(tweets_and_labels)
 

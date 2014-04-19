@@ -30,9 +30,6 @@ from matplotlib import cm, mlab
 
 import random, re, collections, itertools
 
-print TfidfVectorizer()
-
-
 class LemmaTokenizer(object):
 	def __init__(self):
 		self.wnl = WordNetLemmatizer()
@@ -42,7 +39,7 @@ class LemmaTokenizer(object):
 sentiments = [1 ,2, 3]
 target_names = ["Self", "Another Person", "General Statement"]
 
-dv = TfidfVectorizer(ngram_range=(1,2), min_df=0.005, max_df=0.3, tokenizer=LemmaTokenizer())
+dv = TfidfVectorizer(ngram_range=(1,2), min_df=0.0005, max_df=0.3, tokenizer=LemmaTokenizer())
 le = LabelEncoder()
 
 def removeNonAscii(s): return "".join(i for i in s if ord(i)<128)
@@ -108,9 +105,9 @@ def parse_labeled_data(filename):
 	print 'smallest list is of size' + str(smallest)
 
 	#shuffling
-	#random.shuffle(ones)
-	#random.shuffle(twos)
-	#random.shuffle(threes)
+	random.shuffle(ones)
+	random.shuffle(twos)
+	random.shuffle(threes)
 
 	#trimming
 	ones = ones[:smallest]
@@ -132,10 +129,9 @@ def normalize(tweet):
 		tweet.replace(symbol, '')
 
 	toks = nltk.word_tokenize(tweet)
-
 	# only take words - things with lowercase letters 
 	toks = [w.lower() for w in toks]
-
+	#print "TOKES", toks
 	return toks
 
 def ngrams(iterable, n=1):
@@ -172,7 +168,7 @@ def print_top_features(vectorizer, clf, class_labels):
     feature_names = vectorizer.get_feature_names()
     for i, class_label in enumerate(class_labels):
         top20 = np.argsort(clf.coef_[i])[-20:]
-        print("%s: %s" % (class_label, " ".join(feature_names[j] for j in top20)))
+        print("%s: %s" % (class_label, " ".join(feature_names[j] + "\n" for j in top20)))
         print("\n")
 
 filename = "../training_data/ordered_tweets_no_duplicates.txt"
@@ -197,7 +193,7 @@ x_train = sel.transform(x_train)
 x_test = sel.transform(x_test)
 
 #clf=svm.SVC(kernel='rbf', C=1000, gamma=0.0001)
-clf = svm.LinearSVC(C=0.1, penalty='l2', loss="l1", dual=True, fit_intercept=True)
+clf = svm.LinearSVC(C=10, penalty='l2', loss="l1", dual=True, fit_intercept=True)
 clf.fit(x_train, y_train)
 
 
@@ -211,8 +207,10 @@ print "Testing Accuracy"
 print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
 
 
+n_samples, n_features = x_train.shape
+print n_samples, n_features
 
-
+#print dv.get_feature_names()
 
 x_train = fs.fit_transform(x_train, y_train)
 clf.fit(x_train, y_train)
@@ -220,7 +218,6 @@ clf.fit(x_train, y_train)
 print "After", x_train.shape
 
 n_samples, n_features = x_train.shape
-print n_samples, n_features
 
 
 print "Training Accuracy"
@@ -230,7 +227,7 @@ print "Testing Accuracy"
 print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
 
 #print_top_features(dv, clf, target_names)
-graph = True
+graph = False
 
 #print dv.get_feature_names()[:10]
 #print dv.get_feature_names()
@@ -247,7 +244,6 @@ if(graph):
 	    
 	_ = plt.legend(loc='best')
 	plt.show()
-
 
 
 
@@ -295,7 +291,3 @@ if(graph):
 	ax2.set_ylabel('Another Person')
 	ax2.set_autoscale_on(True)
 	plt.show()
-
-
-
-
