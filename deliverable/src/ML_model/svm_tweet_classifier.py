@@ -105,9 +105,9 @@ def parse_labeled_data(filename):
 	print 'smallest list is of size' + str(smallest)
 
 	#shuffling
-	random.shuffle(ones)
-	random.shuffle(twos)
-	random.shuffle(threes)
+	#random.shuffle(ones)
+	#random.shuffle(twos)
+	#random.shuffle(threes)
 
 	#trimming
 	ones = ones[:smallest]
@@ -177,9 +177,9 @@ tweets_and_labels = parse_labeled_data(filename)
 Y, X = get_x_y(tweets_and_labels)
 
 #splitting training and test set
-x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=1)
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=0)
 
-fs = SelectFwe(alpha=400.0)
+fs = SelectFwe(alpha=150.0)
 
 print "Before", x_train.shape
 
@@ -193,9 +193,8 @@ x_train = sel.transform(x_train)
 x_test = sel.transform(x_test)
 
 #clf=svm.SVC(kernel='rbf', C=1000, gamma=0.0001)
-clf = svm.LinearSVC(C=10, penalty='l2', loss="l1", dual=True, fit_intercept=True)
+clf = svm.LinearSVC(C=10, penalty='l2', loss='l1', dual=True, fit_intercept=False, class_weight='auto')
 clf.fit(x_train, y_train)
-
 
 
 
