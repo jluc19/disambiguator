@@ -3,18 +3,39 @@
 #Boyang Zhang and Jason Lucibello
 
 import nltk
-import numpy as np
+from nltk import word_tokenize          # doctest: +SKIP
+from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer # doctest: +SKIP
 from sklearn import svm, grid_search, datasets
 from sklearn.preprocessing import LabelEncoder
-from sklearn.feature_selection import SelectFwe, SelectKBest, SelectPercentile, chi2, f_classif
-from sklearn.feature_extraction import DictVectorizer
-from sklearn.cross_validation import train_test_split
+from sklearn.feature_selection import SelectFwe
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cross_validation import train_test_split, ShuffleSplit, cross_val_score
 from sklearn.metrics import classification_report
+from sklearn.pipeline import FeatureUnion
+from sklearn.feature_selection import SelectPercentile, chi2, f_classif
+from sklearn.decomposition import PCA, RandomizedPCA, KernelPCA
+from pylab import meshgrid,cm,imshow,contour,clabel,colorbar,axis,title,show
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import axes3d, Axes3D
+from matplotlib import cm, mlab
+from numpy import exp,arange
+import numpy as np
 import random, re, collections, itertools
+from itertools import cycle
+
+class LemmaTokenizer(object):
+	def __init__(self):
+		self.ps = PorterStemmer()
+		self.wnl = WordNetLemmatizer()
+	def __call__(self, doc):
+		interim = [self.ps.stem(t) for t in word_tokenize(doc)]
+		return [self.wnl.lemmatize(t) for t in interim]
 
 sentiments = [1 ,2, 3]
 target_names = ["Self", "Another Person", "General Statement"]
-dv = DictVectorizer()
+
+dv = TfidfVectorizer(ngram_range=(1,2), min_df=0.0005, max_df=0.3, tokenizer=LemmaTokenizer())
 le = LabelEncoder()
 
 def removeNonAscii(s): return "".join(i for i in s if ord(i)<128)
@@ -31,13 +52,15 @@ def parse_labeled_data(filename):
 			if line.startswith('###'):
 				continue
 			line = line.rstrip('\n')
-			#removeNonAscii(line)
+			removeNonAscii(line)
 			#print line
 			if i % 2 == 1:
-				line = re.sub('@[^\s]+','USER',line)
+				#line = re.sub('@[^\s]+','USER',line)
+				line = re.sub("!","", line)
 				line = re.sub("^\s+","", line)
-				line = re.sub(r'#([^\s]+)', r'\1', line)
-				#line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
+				#line = re.sub(r'#([^\s]+)', r'\1', line)
+				line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
+				line = normalize(line)
 				tweet = line
 			else:
 				l = int(line)
@@ -99,16 +122,15 @@ def parse_labeled_data(filename):
 
 def normalize(tweet): 
 	# get rid of certain punctuation chars
-	symbols_to_eliminate = ['.', '-', ',']
+	symbols_to_eliminate = ['.', '-', ',', '!', ]
 	for symbol in symbols_to_eliminate:
 		tweet.replace(symbol, '')
 
-	toks = nltk.word_tokenize(tweet)
-
+	#toks = nltk.word_tokenize(tweet)
 	# only take words - things with lowercase letters 
-	toks = [w.lower() for w in toks]
-
-	return toks
+	#toks = [w.lower() for w in toks]
+	#print "TOKES", toks
+	return tweet
 
 def ngrams(iterable, n=1):
 	l = len(iterable)
@@ -125,16 +147,15 @@ def ngram_features(toks, n=1) :
 def get_features(data) :
 	feat = []
 	for tweet in data:
-		toks = normalize(tweet)
-		#print toks
-		tweet_feat = ngram_features(toks, 2)
-		feat.append(tweet_feat)
+		#toks = normalize(tweet)
+		#tweet_feat = ngram_features(toks, 2)
+		#feat.append(tweet_feat)
+		feat.append(tweet)
 	feats = dv.fit_transform(feat)
 	return feats
 
 def get_x_y(data):
 	le.fit(sentiments)
-	#print data
 	Y = le.transform([d[1] for d in data])
 	X = get_features([d[0] for d in data])
 	print "Y, X SIZE", len(Y)
@@ -145,7 +166,7 @@ def print_top_features(vectorizer, clf, class_labels):
     feature_names = vectorizer.get_feature_names()
     for i, class_label in enumerate(class_labels):
         top20 = np.argsort(clf.coef_[i])[-20:]
-        print("%s: %s" % (class_label, " ".join(feature_names[j] for j in top20)))
+        print("%s: %s" % (class_label, " ".join(feature_names[j] + "\n" for j in top20)))
         print("\n")
 
 def test_data_parse():
@@ -175,26 +196,23 @@ def run():
 
 	#splitting training and test set
 	#TODO this line should be deleted
-	x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
-	fs = SelectFwe(alpha=205.0)
+	x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=0)
+
+	fs = SelectFwe(alpha=150.0)
+
 	print "Before", x_train.shape
-	x_train = fs.fit_transform(x_train, y_train)
-	print "After", x_train.shape
+
 
 	print "Univariate Feature Selection"
-	sel = SelectPercentile(chi2, percentile=70)
-	#kb  = SelectKBest(k=50)
-
+	sel = SelectPercentile(chi2, percentile=80)
 	sel.fit(x_train, y_train)
 
-
-	
-	
+		
 	x_train = sel.transform(x_train)
+	x_test = sel.transform(x_test)
 
-	#kb.fit(x_train, y_train)
-	#x_train = kb.transform(x_train)
-	clf = svm.LinearSVC(C=100, penalty = 'l2', dual=False)
+	#clf=svm.SVC(kernel='rbf', C=1000, gamma=0.0001)
+	clf = svm.LinearSVC(C=10, penalty='l2', loss='l1', dual=True, fit_intercept=False, class_weight='auto')
 	clf.fit(x_train, y_train)
 	print_top_features(dv, clf, target_names)
 

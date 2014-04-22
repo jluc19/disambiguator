@@ -7,34 +7,33 @@
 
 import nltk
 from nltk import word_tokenize          # doctest: +SKIP
+from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer # doctest: +SKIP
-import numpy as np
-from itertools import cycle
-from numpy import exp,arange
 from sklearn import svm, grid_search, datasets
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_selection import SelectFwe
-from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cross_validation import train_test_split, ShuffleSplit, cross_val_score
 from sklearn.metrics import classification_report
 from sklearn.pipeline import FeatureUnion
 from sklearn.feature_selection import SelectPercentile, chi2, f_classif
-from sklearn.decomposition import PCA, RandomizedPCA
-from sklearn.decomposition import KernelPCA
-
+from sklearn.decomposition import PCA, RandomizedPCA, KernelPCA
 from pylab import meshgrid,cm,imshow,contour,clabel,colorbar,axis,title,show
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d, Axes3D
 from matplotlib import cm, mlab
-
+from numpy import exp,arange
+import numpy as np
 import random, re, collections, itertools
+from itertools import cycle
 
 class LemmaTokenizer(object):
 	def __init__(self):
+		self.ps = PorterStemmer()
 		self.wnl = WordNetLemmatizer()
 	def __call__(self, doc):
-		return [self.wnl.lemmatize(t) for t in word_tokenize(doc)]
+		interim = [self.ps.stem(t) for t in word_tokenize(doc)]
+		return [self.wnl.lemmatize(t) for t in interim]
 
 sentiments = [1 ,2, 3]
 target_names = ["Self", "Another Person", "General Statement"]
@@ -60,9 +59,11 @@ def parse_labeled_data(filename):
 			#print line
 			if i % 2 == 1:
 				#line = re.sub('@[^\s]+','USER',line)
+				line = re.sub("!","", line)
 				line = re.sub("^\s+","", line)
 				#line = re.sub(r'#([^\s]+)', r'\1', line)
 				line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
+				line = normalize(line)
 				tweet = line
 			else:
 				l = int(line)
@@ -124,15 +125,15 @@ def parse_labeled_data(filename):
 
 def normalize(tweet): 
 	# get rid of certain punctuation chars
-	symbols_to_eliminate = ['.', '-', ',']
+	symbols_to_eliminate = ['.', '-', ',', '!', ]
 	for symbol in symbols_to_eliminate:
 		tweet.replace(symbol, '')
 
-	toks = nltk.word_tokenize(tweet)
+	#toks = nltk.word_tokenize(tweet)
 	# only take words - things with lowercase letters 
-	toks = [w.lower() for w in toks]
+	#toks = [w.lower() for w in toks]
 	#print "TOKES", toks
-	return toks
+	return tweet
 
 def ngrams(iterable, n=1):
 	l = len(iterable)
@@ -228,7 +229,7 @@ print (classification_report(y_test, clf.predict(x_test), target_names=target_na
 #print_top_features(dv, clf, target_names)
 graph = False
 
-#print dv.get_feature_names()[:10]
+print dv.get_feature_names()[:10]
 #print dv.get_feature_names()
 
 
