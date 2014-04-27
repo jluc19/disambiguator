@@ -179,7 +179,7 @@ def test_get_x():
 	#TODO get X sparse matrix of unlabeled tweets here for testing
 
 def run():
-	filename = "../training_data/ordered_tweets_no_duplicates.txt"
+	filename = "../training_data/diabetes_training_set.txt"
 	
 	tweets_and_labels = parse_labeled_data(filename)
 
