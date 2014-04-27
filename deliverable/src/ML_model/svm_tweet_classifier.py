@@ -185,7 +185,7 @@ fs = SelectFwe(alpha=150.0)
 print "Before", x_train.shape
 
 
-print "Univariate Feature Selection"
+#print "Univariate Feature Selection"
 sel = SelectPercentile(chi2, percentile=80)
 sel.fit(x_train, y_train)
 
@@ -199,16 +199,16 @@ clf.fit(x_train, y_train)
 
 
 
-print "NO FEATURE SELECTION"
-print "Training Accuracy"
+#print "NO FEATURE SELECTION"
+#print "Training Accuracy"
 #print clf.decision_function(x_train)
-print (classification_report(y_train, clf.predict(x_train), target_names=target_names))
-print "Testing Accuracy"
-print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
+#print (classification_report(y_train, clf.predict(x_train), target_names=target_names))
+#print "Testing Accuracy"
+#print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
 
 
 n_samples, n_features = x_train.shape
-print n_samples, n_features
+#print n_samples, n_features
 
 #print dv.get_feature_names()
 
@@ -227,9 +227,9 @@ print "Testing Accuracy"
 print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
 
 #print_top_features(dv, clf, target_names)
-graph = False
+graph = True
 
-print dv.get_feature_names()[:10]
+#print dv.get_feature_names()[:10]
 #print dv.get_feature_names()
 
 
