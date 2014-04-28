@@ -53,20 +53,7 @@ def parse_labeled_data(filename):
 			line = line.rstrip('\n')
 			removeNonAscii(line)
 			if i % 2 == 1:
-				line = re.sub("!","", line)
-				line = re.sub("^\s+","", line)
-				line = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',line)
 				line = normalize(line)
-
-				#Other Potential Levers
-				#line = re.sub('@[^\s]+','USER',line)
-				#line = re.sub(r'#([^\s]+)', r'\1', line)
-				#line = re.sub(r"\b\d+\s?(?:[wW]|px|Px|[Pp]ixels|[hH])?\s*(?:x|by|X)\s*\d+\s?(?:[hH]|px|Px|[Pp]ixels|[wW])?\b",'',line)
-				#line = re.sub(r"""((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.‌​][a-z]{2,4}/)(?:[^\s()<>]+|(([^\s()<>]+|(([^\s()<>]+)))*))+(?:(([^\s()<>]+|(‌​([^\s()<>]+)))*)|[^\s`!()[]{};:'".,<>?«»“”‘’]))""",'',line)
-				#line = re.sub(r"[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*",'',line)
-				#line = re.sub(r"""\d+\s?(?:DPI|dpi)""",'',line)
-				#line = re.sub(r"""#[A-Fa-f0-9]{6}""",'',line)
-				
 				tweet = line
 			else:
 				l = int(line)
@@ -119,23 +106,40 @@ def parse_labeled_data(filename):
 
 def normalize(tweet): 
 	# get rid of certain punctuation chars
+	tweet = re.sub("!","", tweet)
+	tweet = re.sub("^\s+","", tweet)
+	tweet = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''','',tweet)
+	
+	#Other Potential Levers
+	#tweet = re.sub('@[^\s]+','USER',tweet)
+	#tweet = re.sub(r'#([^\s]+)', r'\1', tweet)
+	#tweet = re.sub(r"\b\d+\s?(?:[wW]|px|Px|[Pp]ixels|[hH])?\s*(?:x|by|X)\s*\d+\s?(?:[hH]|px|Px|[Pp]ixels|[wW])?\b",'',tweet)
+	#tweet = re.sub(r"""((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.‌​][a-z]{2,4}/)(?:[^\s()<>]+|(([^\s()<>]+|(([^\s()<>]+)))*))+(?:(([^\s()<>]+|(‌​([^\s()<>]+)))*)|[^\s`!()[]{};:'".,<>?«»“”‘’]))""",'',tweet)
+	#tweet = re.sub(r"[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*",'',tweet)
+	#tweet = re.sub(r"""\d+\s?(?:DPI|dpi)""",'',tweet)
+	#tweet = re.sub(r"""#[A-Fa-f0-9]{6}""",'',tweet)
+
 	symbols_to_eliminate = ['.', '-', ',', '!', ]
 	for symbol in symbols_to_eliminate:
 		tweet.replace(symbol, '')
 	return tweet
 
-def get_features(data) :
+def get_features(data, testdata) :
+	print len(data), len(testdata)
 	feat = []
-	for tweet in data:
+	totaldata = data + testdata
+	for tweet in totaldata:
 		feat.append(tweet)
 	feats = dv.fit_transform(feat)
-	return feats
+	x_train = feats[0:len(data), :]
+	x_test = feats[len(data):len(totaldata), :]
+	return x_test, x_train
 
-def get_x_y(data):
+def get_x_y(data, testdata):
 	le.fit(sentiments)
 	Y = le.transform([d[1] for d in data])
-	X = get_features([d[0] for d in data])
-	return Y, X
+	x_test, x_train = get_features([d[0] for d in data], [d[0] for t in testdata])
+	return Y, x_test, x_train
 
 def print_top_features(vectorizer, clf, class_labels):
     """Prints features with the highest coefficient values, per class"""
@@ -145,24 +149,34 @@ def print_top_features(vectorizer, clf, class_labels):
         print("%s: %s" % (class_label, " ".join(feature_names[j] + "\n" for j in top20)))
         print("\n")
 
-def test_data_parse():
-	print 0
-	#TODO do parsing of unlabeled tweets here for testing
-
-def test_get_x():
-	print 0
-	#TODO get X sparse matrix of unlabeled tweets here for testing
+def test_data_parse(filename):
+	data = []
+	with open(filename, 'r') as f:
+		for line in f:
+			user, comma, tweet = line.partition(',')
+			normalize(tweet)
+			removeNonAscii(tweet)
+			tweet.strip('\n')
+			tweet = re.sub(r"\b\d+\s?(?:[wW]|px|Px|[Pp]ixels|[hH])?\s*(?:x|by|X)\s*\d+\s?(?:[hH]|px|Px|[Pp]ixels|[wW])?\b",'',tweet)
+			tweet = re.sub(r"""((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.‌​][a-z]{2,4}/)(?:[^\s()<>]+|(([^\s()<>]+|(([^\s()<>]+)))*))+(?:(([^\s()<>]+|(‌​([^\s()<>]+)))*)|[^\s`!()[]{};:'".,<>?«»“”‘’]))""",'',tweet)
+			tweet = re.sub(r"[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*",'',tweet)
+			tweet = re.sub(r"""\d+\s?(?:DPI|dpi)""",'',tweet)
+			tweet = re.sub(r"""#[A-Fa-f0-9]{6}""",'',tweet)
+			data.append((tweet,user))
+	return data
 
 def run():
 	target_names = ["Self", "Another Person", "General Statement"]
 	filename = "../training_data/labeled_data/diabetes_training_set.txt"
-	
+	testdata = test_data_parse("../tweet_scraper/26_04_2014_scrape.csv")
+	#print testdata
 	tweets_and_labels = parse_labeled_data(filename)
 
 	#random.shuffle(tweets_and_labels)
-	#TODO: change Y and X to Y_train and X_train
-	Y, X = get_x_y(tweets_and_labels)
-
+	y_train, x_test, x_train = get_x_y(tweets_and_labels, testdata)
+	print "Y_train", y_train.shape, y_train
+	print "X_test", x_test.shape, x_test
+	print "X_train", x_train.shape, x_train
 	'''
 	testfile = "test.txt"
 	test_tweets = test_data_parse(testfile)
@@ -172,11 +186,12 @@ def run():
 
 	#splitting training and test set
 	#TODO this line should be deleted
-	x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=0)
+	#x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=0)
 
 	fs = SelectFwe(alpha=150.0)
 
-	print "Before", x_train.shape
+	print "Before x_train", x_train.shape
+	print "Before x_test", x_test.shape
 
 
 	sel = SelectPercentile(chi2, percentile=80)
@@ -188,18 +203,24 @@ def run():
 	clf = svm.LinearSVC(C=10, penalty='l2', loss='l1', dual=True, fit_intercept=False, class_weight='auto')
 	x_train = fs.fit_transform(x_train, y_train)
 	clf.fit(x_train, y_train)
+
 	print "After", x_train.shape
+	print "After", x_test.shape
 
 	#print_top_features(dv, clf, target_names)
 
-	x_test = fs.transform(x_test)
 	
 	print "Training Accuracy"
 	print (classification_report(y_train, clf.predict(x_train), target_names=target_names))
 	print "Testing Accuracy"
-	print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
+	x_test = fs.transform(x_test)
+	print "After", x_train.shape, x_test.shape
 
-	graph = True
+	print clf.predict(x_test)
+	f1=open('./testfile', 'w+')
+	f1.write(x_test)
+	f1.close()
+	graph = False
 
 	if(graph):
 		#scatter plot of scores
@@ -250,7 +271,8 @@ def run():
 		ax2.set_ylabel('Another Person')
 		ax2.set_autoscale_on(True)
 		plt.show()
-		
+
+np.set_printoptions(threshold='nan') #allows full printing of numpy.ndarrays
 le = LabelEncoder()
 sentiments = [1 ,2, 3]
 dv = TfidfVectorizer(ngram_range=(1,2), min_df=0.0005, max_df=0.3, tokenizer=LemmaTokenizer())

@@ -7,7 +7,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import re
+import re, random
 from nltk import word_tokenize          # doctest: +SKIP
 from nltk.stem import PorterStemmer, WordNetLemmatizer # doctest: +SKIP
 from sklearn import svm
@@ -20,6 +20,7 @@ from sklearn.feature_selection import SelectPercentile, chi2
 from sklearn.decomposition import RandomizedPCA
 from mpl_toolkits.mplot3d import Axes3D
 from itertools import cycle
+np.set_printoptions(threshold='nan') #allows full printing of numpy.ndarrays
 
 class LemmaTokenizer(object):
 	def __init__(self):
@@ -177,9 +178,14 @@ Y, X = get_x_y(tweets_and_labels)
 #splitting training and test set
 x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=0)
 
+print x_train.shape
+print x_test.shape
+print y_train.shape
+print y_test.shape
+
 fs = SelectFwe(alpha=150.0)
 
-print "Before", x_train.shape
+print "Before", x_train.shape, x_test.shape
 
 sel = SelectPercentile(chi2, percentile=80)
 sel.fit(x_train, y_train)
@@ -191,12 +197,14 @@ clf = svm.LinearSVC(C=10, penalty='l2', loss='l1', dual=True, fit_intercept=Fals
 x_train = fs.fit_transform(x_train, y_train)
 clf.fit(x_train, y_train)
 
-print "After", x_train.shape
+print "After", x_train.shape, x_test.shape
 
 print "Training Accuracy"
 print (classification_report(y_train, clf.predict(x_train), target_names=target_names))
 x_test = fs.transform(x_test)
+print "After", x_train.shape, x_test.shape
 print "Testing Accuracy"
+print clf.predict(x_test)
 print (classification_report(y_test, clf.predict(x_test), target_names=target_names))
 
 #print_top_features(dv, clf, target_names)
