@@ -36,6 +36,6 @@ def format_row(user, tweet):
         joined = "@" + user + ", " + tweet
         tweet = ''.join(c for c in tweet if 0 < ord(c) < 127)
         row = ["@"+user, tweet]
-        wr = csv.writer(output, quoting=csv.QUOTE_NONE)
+        wr = csv.writer(output, quoting=csv.QUOTE_ALL)
         wr.writerow(row)
 scrape()

@@ -161,6 +161,7 @@ def test_data_parse(filename):
 	data = []
 	with open(filename, 'r') as f:
 		for line in f:
+			line = re.sub(r'"', '', line)
 			user, comma, tweet = line.partition(',')
 			normalize(tweet)
 			removeNonAscii(tweet)
@@ -232,7 +233,7 @@ def graph_2d(X, Y, new_y):
 
 
 '''This line determines which unknown dataset of tweets to use'''
-testdata = test_data_parse("../tweet_scraper/26_04_2014_scrape.csv")
+testdata = test_data_parse("../tweet_scraper/28_04_2014_scrape.csv")
 ####################################################################
 
 def run():
@@ -262,8 +263,8 @@ def run():
 
 	#Print relevant usernames & tweets to .csv file
 	t = time.strftime("%d_%m_%Y")
-	output1 = t + '_self_classification.csv'
-	output2 = t + '_another_person_classification.csv'
+	output1 = 'classifications/' + t + '_self.csv'
+	output2 = 'classifications/' + t + '_another_person.csv'
 	with open(output1, 'w+') as o1: 
 		wr = csv.writer(o1, quoting=csv.QUOTE_ALL)
 		for i, val in enumerate(returned):
