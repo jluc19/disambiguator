@@ -6,7 +6,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import re, random
+import re, random, warnings
 from nltk import word_tokenize
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 from sklearn import svm
@@ -28,6 +28,7 @@ filename = "../training_data/labeled_data/diabetes_training_set.txt"
 
 #General Setup
 np.set_printoptions(threshold='nan') #allows full printing of numpy.ndarrays
+warnings.filterwarnings("ignore")
 
 class LemmaTokenizer(object):
 	"""class used for NLTK tokenization"""

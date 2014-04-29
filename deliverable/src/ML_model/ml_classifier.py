@@ -6,7 +6,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import re, random, time, csv
+import re, random, time, csv, warnings
 from nltk import word_tokenize
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 from sklearn import svm
@@ -25,6 +25,7 @@ filename = "../training_data/labeled_data/diabetes_training_set.txt"
 ##########################################################
 
 np.set_printoptions(threshold='nan') #allows full printing of numpy.ndarrays
+warnings.filterwarnings("ignore")
 
 class LemmaTokenizer(object):
 	"""class used for NLTK tokenization"""
@@ -260,7 +261,7 @@ def run():
 	clf.fit(x_train, y_train)
 
 	returned = clf.predict(x_test)
-
+	print returned
 	#Print relevant usernames & tweets to .csv file
 	t = time.strftime("%d_%m_%Y")
 	output1 = 'classifications/' + t + '_self.csv'
