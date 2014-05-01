@@ -201,8 +201,10 @@ def graph_scatter(x_train, y_train):
 	for i, c in zip(np.unique(y_train), cycle(colors)):
 		plt.scatter(train_small_pca[y_train == i, 0],
 				   train_small_pca[y_train == i, 1],
-				   c=c, label=sentiments[i], alpha=0.5)   
+				   c=c, label=sentiments[i], alpha=0.5, s=10)   
 	_ = plt.legend(loc='best')
+	plt.xlim(-0.01, 0.4)
+	plt.ylim(-0.4, 0.3)
 	plt.show()
 
 def graph_3d(X, Y, Z, new_y):
