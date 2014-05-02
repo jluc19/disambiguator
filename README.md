@@ -1,7 +1,7 @@
 #Disease Classifier V1.0 4/30/2014
 Identifying Clinical Trial Candidates through Machine Learning
 
-Jason Lucibello, Nathan Fraenkel, Varun Gupta, Dan Zhang
+Jason Lucibello, Nathan Fraenkel, Varun Gupta, Boyang Zhang
 
 
 # Disease Classifier
@@ -137,4 +137,4 @@ Note: On Mac OS X 10.9, flags must be added for the compilation to work.
 	pip install scikit-learn
 
 ## Contributors
-Created by Jason Lucibello, Nathan Fraenkel, Varun Gupta, and Dan Zhang at the University of Pennsylvania 2014
+Created by Jason Lucibello, Nathan Fraenkel, Varun Gupta, and Boyang Zhang at the University of Pennsylvania 2014
