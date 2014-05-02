@@ -63,9 +63,11 @@ In /mTurk,
 
 Create a Mechanical Turk Requester profile, and create a new project, using mTurk_HTML.html as the webview for the project.
 
-Once turkers have completed your HITs, in \mTurk,
+Once turkers have completed your HITs, in \mTurk, download results csv from Manage tab. Place csv file in \mTurk folder and run
 
-	python review_hits.py
+	python review_hits.py [filename]
+
+Review script outputs Accepted and rejected tweets in seperate files with Turkers labels. Also outputs csv file which is to be uploaded to MTurk in order to accept and reject respective Turkers. 
 
 To extract the annotated tweets for the ML model. Depending on the accuracy and speed of the Turkers, this process may require manual inspection of tweets to double check for accuracy. In future iterations, we hope to improve the accuracy checking mechanism for MTurk tweets.
 
