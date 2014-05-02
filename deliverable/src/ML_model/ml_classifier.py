@@ -22,6 +22,10 @@ from itertools import cycle
 '''This line determines which annotated dataset to use'''
 
 filename = "../training_data/labeled_data/diabetes_training_set.txt"
+
+'''File path for test file'''
+testpath = "../twitter_scraper/28_04_2014_scrape.csv"
+
 ##########################################################
 
 np.set_printoptions(threshold='nan') #allows full printing of numpy.ndarrays
@@ -226,9 +230,10 @@ def graph_2d(X, Y, new_y):
 ####################################################################
 '''Model Code'''
 
-
 '''This line determines which unknown dataset of tweets to use'''
-testdata = test_data_parse("../tweet_scraper/28_04_2014_scrape.csv")
+
+testdata = test_data_parse(testpath)
+
 ####################################################################
 
 def run():
