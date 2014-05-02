@@ -1,70 +1,164 @@
-from boto.mturk.connection import MTurkConnection
+import csv
+import sys
 
-ACCESS_ID = 'AKIAJDAK4I66WU7O6NVQ'
-SECRET_KEY = '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'
-HOST = 'mechanicalturk.sandbox.amazonaws.com'
- 
-def get_all_reviewable_hits(conn):
-    hits = conn.get_reviewable_hits(page_size = 93)
-    print "Total results to fetch %s " % hits.TotalNumResults
-    return hits
-   
- 
-conn = MTurkConnection(aws_access_key_id=ACCESS_ID, aws_secret_access_key=SECRET_KEY, host=HOST)
- 
-hits = get_all_reviewable_hits(conn)
-#print hits
-f = open('control_tweets_with_labels.txt')
-file_content = f.readlines()
-control_labels = {}
+def review_hits(filename):
+	f_accept = open("results_accepted.csv", 'w')
+	f_reject = open("results_rejected1.csv", 'w')
 
-for line in file_content:
-    splitted = line.split()
-    label = splitted[len(splitted) - 1]
-    control_labels[" ".join(line.split()[0:-1])] = label
-    
-f = open("rejected_tweets.txt", 'w')
-f1 = open("accepted_tweets.txt", 'w')
-for hit in hits:
-    assignments = conn.get_assignments(hit.HITId)
-    #conn.disable_hit(hit.HITId)
-    approve = False
-    for assignment in assignments:
-        #print "Answers of the worker %s" % assignment.WorkerId
-        for question_form_answer in assignment.answers[0]:
-            question = question_form_answer.qid.replace('\n', '')
-            answer = question_form_answer.fields[0]
-           # print question
-            if question in control_labels.keys():
-              #  print 'here' 
-                if answer == control_labels[question]:
-                    approve = True
+	start = True
+	f_approve = open("approval_"+filename, "w")
+	newline = ""
 
-            
+	for line_list in csv.reader(open(filename, "r")):
+		if start:
+			print line_list[48:68]
+			print line_list[68:88]
+			print line_list[88:108]
+			print line_list[108:128]
+			print line_list[128:148]
+			newline = ','.join(line_list)
+			f_approve.write(newline)
+			start = False
+		else:
+			tweet_label_dict = {}
+			control1 = False
+			control2 = False
+			tweets = line_list[27:48]
+			q1_list = line_list[48:68]
+			q2_list = line_list[68:88]
+			q3_list = line_list[88:108]
+			q4_list = line_list[108:128]
+			q5_list = line_list[128:148]
+			
+			for i in range(0,20):
+				label = 0
 
-           # print '%s\t%s'%(question_form_answer.qid, question_form_answer.fields[0])
-    
-   
+				if q1_list[i] == "Yes" and q3_list[i] == "Yes": 
+					if q2_list[i] == "Themselves":
+						label = '1'
+					else:
+						label = '2'
+				elif q1_list[i] is "No" or q4_list[i] == "Yes":
+					if q5_list[i] == "Yes":
+						label = '4'
+					else:
+						label = '3'
+				
+				else:
+					if q5_list[i] == '"Yes"':
+						label = '4'
+					else:
+						label = '3'
 
-    if approve == False:
-        for assignment in assignments:
-            for question_form_answer in assignment.answers[0]:
-                f.writelines(question_form_answer.qid.encode('ascii', 'ignore'))
-            conn.reject_assignment(assignment.AssignmentId)
-        conn.disable_hit(hit.HITId)
-    else:
-        for assignment in assignments:
-            for question_form_answer in assignment.answers[0]:
-                f1.write(question_form_answer.qid.encode('ascii', 'ignore'))
-                f1.write(question_form_answer.fields[0].encode('ascii', 'ignore') + '\n')
-            conn.approve_assignment(assignment.AssignmentId)
-        conn.disable_hit(hit.HITId)
-        
+				
+				if i == 5:
+					print tweets[i]
+					print q1_list[i]
+					print q2_list[i]
+					print q3_list[i]
+					print q4_list[i]
+					print q5_list[i]
+					print label
+					control1 = compare_control(tweets[i], label)
+				elif i == 15:
+					print tweets[i]
+					print q1_list[i]
+					print q2_list[i]
+					print q3_list[i]
+					print q4_list[i]
+					print q5_list[i]
+					print label
+					control2 = compare_control(tweets[i], label)
+				else:
+					tweet_label_dict[tweets[i]] = label
 
-     
 
-    	#Uncomment to approve assignment. Approving will remove this assignment from reviewable HITs, so store the data before approving 
+				#if both controls match, then accept else reject	
+			if control1 and control2:
+				for key, value in tweet_label_dict.iteritems():
+					f_accept.write(key + '\n')
+					f_accept.write(value + '\n')
+				newline = ','.join(line_list)
+				newline = newline + ',X, '
+			else:
+				for key, value in tweet_label_dict.iteritems():
+					f_reject.write(key + '\n')
+					f_reject.write(value + '\n')
+				newline = ','.join(line_list)
+				newline = newline + ',,HIT was not completed accurately'
+		f_approve.write(newline + '\n')	
+	f_accept.close()
+	f_reject.close()
+	f_approve.close()
 
-    
-    #Uncomment to remove all remaining assignments that have not been completed and approved/rejected
- 
+
+def compare_control(tweet, label):
+	if label is '4':
+		label = '3'
+
+	print "label"
+	print label
+	# issue with utf encoding characters for one tweet
+	if "Yall still making excuses" in tweet:
+		value = (v for (k,v) in control_dict.iteritems() if 'Yall still making excuses' in k).next()
+
+		if label == value:
+			print "------------------------------------------------------"
+
+			return True
+		else:
+			print "value"
+			print value
+			#print label + "\t" + tweet + "\t" + value
+			print "------------------------------------------------------"
+
+			return False
+	#all other control tweets
+	else:
+		if 'I think Ive got diabetes' in tweet or 'Diagnosed myself with diabetes' in tweet or 'I think Ive got diabetes' in tweet:
+			if label == '3':
+				print "------------------------------------------------------"
+
+				return True
+		value = control_dict[tweet]
+		
+		if label == value:
+			print "------------------------------------------------------"
+
+			return True
+		else:
+			print "value"
+			print value
+			#print label + "\t" + tweet + "\t" + control_dict[tweet]
+			print "------------------------------------------------------"
+
+			return False
+
+f_control = open("control_tweets_with_labels.txt", 'r')
+control_dict = {}
+for line in f_control:
+	key = line.split('\t')[0]
+	control_dict[key] = line.split('\t')[1].replace('\n', '')
+
+f_control.close()
+review_hits(sys.argv[1])
+
+
+
+
+
+
+
+
+
+#1: tweet about person?
+#2: themselves or another person
+#3: Diabetes?
+#4: Joke?
+#5: Diabetes as disease
+
+#if 1 is no or 4 is yes, then 3
+#if 3 and 5 is yes, then 4
+#if 1 is yes, 2 is themselves, then 1
+#if 1 is yes, 2 is other person, then 2
+

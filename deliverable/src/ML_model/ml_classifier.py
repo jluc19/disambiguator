@@ -149,14 +149,6 @@ def get_x_y(data, testdata):
 	x_test, x_train = get_features([d[0] for d in data], [t[0] for t in testdata])
 	return Y, x_test, x_train
 
-def print_top_features(vectorizer, clf, class_labels):
-	"""Prints features with the highest coefficient values, per class"""
-	feature_names = vectorizer.get_feature_names()
-	for i, class_label in enumerate(class_labels):
-		top20 = np.argsort(clf.coef_[i])[-20:]
-		print("%s: %s" % (class_label, " ".join(feature_names[j] + "\n" for j in top20)))
-		print("\n")
-
 def test_data_parse(filename):
 	"""Parses test data from file"""
 	data = []
@@ -281,8 +273,6 @@ def run():
 			if val == 1:
 				row = [testdata[i][1], testdata[i][0]]
 				wr.writerow(row)
-
-	#print_top_features(dv, clf, target_names)
 
 
 	########################################################################
