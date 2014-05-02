@@ -22,11 +22,14 @@ Mechanical Turk interface asks turkers binary questions about tweets and then us
 ##Machine Learning Model
 Our model uses a Linear Support Vector Machine to classify tweets into 3 categories.
 
+
 Self: the tweeter has the chosen disease
 
 Other: the tweeter refers to another person with the chosen disease
 
 General: the tweeter speaks about the disease in general
+
+
 
 Our features are composed of tweet unigrams and bigrams.
 
@@ -41,7 +44,9 @@ Training data should be of the form
 	Annotation
 
 # Usage
-##Python Scraper: scrapes twitter.com for tweets based on keywords
+##Python Scraper: 
+
+Scrapes twitter.com for tweets based on keywords
 
 In /twitter_scraper, 
 
@@ -64,7 +69,9 @@ Once turkers have completed your HITs, in \mTurk,
 
 To extract the annotated tweets for the ML model. Depending on the accuracy and speed of the Turkers, this process may require manual inspection of tweets to double check for accuracy. In future iterations, we hope to improve the accuracy checking mechanism for MTurk tweets.
 
-##ML Model: Takes in training and test set as input and classifies tweets into 3 categories. Output is text files of tweet/user pairs
+##ML Model
+
+Takes in training and test set as input and classifies tweets into 3 categories. Output is text files of tweet/user pairs
 
 Identify annotated training dataset and set in line 24 of /ML_model/ml_classifier.py
 
@@ -79,20 +86,27 @@ Ouputs for each class of the model will be found in /ML_model/classifications
 # Installation
 The tool requires the following Python Libraries:
 
-1. TwitterSearch
-	
+##TwitterSearch
+
 	pip install TwitterSearch
 
-2. Languid: (https://github.com/saffsd/langid.py) Language and duplicate detection.
+## Languid
 
-3. MatPlotLib: (http://matplotlib.org/downloads.html) This is used to view graphics output of Scikit-learn.
+(https://github.com/saffsd/langid.py) Language and duplicate detection.
 
-4. NLTK
-	
+##MatPlotLib
+
+(http://matplotlib.org/downloads.html) This is used to view graphics output of Scikit-learn.
+
+##NLTK
+
 	sudo pip install -U numpy
+	
 	sudo pip install -U pyyaml nltk
 
-5. Scikit-learn: http://scikit-learn.org/stable/install.html
+##Scikit-learn
+
+(http://scikit-learn.org/stable/install.html)
 
 Note: On Mac OS X 10.9, flags must be added for the compilation to work.
 (From https://gist.github.com/xlfe/7786057)
