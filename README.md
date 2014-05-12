@@ -77,7 +77,7 @@ Takes in training and test set as input and classifies tweets into 3 categories.
 
 Identify annotated training dataset and set in line 24 of /ML_model/ml_classifier.py
 
-Identify unknown test dataset from Twitter Scraper and set in line 239 of ML_model/ml_classifier.py
+Identify unknown test dataset from Twitter Scraper and set in line 27 of ML_model/ml_classifier.py
 
 In /ML_model,
 
